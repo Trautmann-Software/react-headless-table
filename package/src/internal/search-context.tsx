@@ -2,7 +2,7 @@ import { createContext, PropsWithChildren, useDeferredValue, useEffect, useMemo,
 import { noop } from '../utils';
 import { UseSearchQuery } from '../types';
 
-type SearchContextProps = UseSearchQuery;
+type SearchContextProps = Omit<UseSearchQuery, 'deferredSearchQuery'>;
 
 export const SearchContext = createContext<SearchContextProps>({
   searchQuery: '',
