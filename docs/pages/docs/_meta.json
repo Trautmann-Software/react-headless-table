@@ -1,0 +1,12 @@
+{
+  "getting-started": "Getting started",
+  "---": {
+    "type": "separator"
+  },
+  "hooks": "Hooks",
+  "---": {
+    "type": "separator"
+  },
+  "banana": "Banana",
+  "apple": "Apple"
+}

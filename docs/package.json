@@ -1,0 +1,25 @@
+{
+  "name": "@trautmann/react-headless-table-documentation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "@trautmann/react-headless-table Documentation",
+  "author": "Rashad Asgarbayli",
+  "keywords": [
+    "gatsby"
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@next/font": "13.1.1",
+    "@types/node": "18.11.18",
+    "next": "13.1.1",
+    "nextra": "^2.0.2",
+    "nextra-theme-docs": "^2.0.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  }
+}

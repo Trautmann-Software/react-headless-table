@@ -1,0 +1,242 @@
+import { useState } from 'react';
+import { Callout, Tab, Tabs } from 'nextra-theme-docs';
+
+# Examples
+
+## React hooks/components
+export function Counter({ children }) {
+  const [count, setCount] = useState(0)
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      {children}{count}
+    </button>
+  );
+}
+
+<Counter>**Clicks**: </Counter>
+```jsx showLineNumbers
+import { useState } from 'react'
+
+export function Counter({ children }) {
+  const [count, setCount] = useState(0)
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      {children}{count}
+    </button>
+  );
+}
+
+<Counter>**Clicks**: </Counter>
+```
+
+## Formatting
+~~removed~~ *emp* **bold** _italic_
+```md
+~~removed~~ *emp* **bold** _italic_
+```
+
+## Task/Checkboxes
+- [x] Write the press release
+- [ ] Update the website
+- [ ] Contact the media
+```md
+- [x] Write the press release
+- [ ] Update the website
+- [ ] Contact the media
+```
+
+## Table
+| Syntax        | Description |   Test Text |
+| :------------ | :---------: | ----------: |
+| Header        |    Title    | Here's this |
+| Paragraph     |    Text     |    And more |
+| Strikethrough |             |    ~~Text~~ |
+```md
+| Syntax        | Description |   Test Text |
+| :------------ | :---------: | ----------: |
+| Header        |    Title    | Here's this |
+| Paragraph     |    Text     |    And more |
+| Strikethrough |             |    ~~Text~~ |
+```
+
+## Code snippet
+```js
+console.log('hello, world')
+```
+
+````md
+```js
+console.log('hello, world')
+```
+````
+
+### Inlined syntax highlighting
+Start `let x = 1{:jsx}` end
+```md
+Start `let x = 1{:jsx}` end
+```
+
+### Code highlight
+```jsx {1,4-5}
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+````md
+```jsx {1,4-5}
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+````
+
+#### Words
+```js /useState/, /count/
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+````md
+```js /useState/
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+````
+
+### Show line numbers
+```js showLineNumbers
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+````md
+```js showLineNumbers
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+````
+
+### Show file name
+```js filename="main.js"
+console.log('hello, world')
+```
+````md
+```js filename="main.js"
+console.log('hello, world')
+```
+````
+
+## Image
+```jsx filename="JSX"
+import Image from 'next/image';
+
+<Image src="/demo.png" alt="Hello" width={500} height={500} />
+```
+```md filename="MD"
+![Hello](/demo.png)
+```
+
+## Link
+```jsx filename="JSX"
+import Link from 'next/link';
+
+<Link href="/docs/pages/about">Click to read more.</Link>
+```
+```md filename="MD"
+[Click here to read more.](/about)
+```
+
+## Callout
+<Callout type="default">
+  Default
+</Callout>
+```jsx showLineNumbers
+import { Callout } from 'nextra-theme-docs';
+
+<Callout type="default">
+  Default
+</Callout>
+```
+<br />
+<Callout type="info">
+  Today is Friday.
+</Callout>
+```jsx showLineNumbers
+import { Callout } from 'nextra-theme-docs';
+
+<Callout type="info">
+  Today is Friday.
+</Callout>
+```
+<br />
+<Callout type="warning">
+  This API will be deprecated soon.
+</Callout>
+```jsx showLineNumbers
+import { Callout } from 'nextra-theme-docs';
+
+<Callout type="warning">
+  This API will be deprecated soon.
+</Callout>
+```
+<br />
+<Callout type="error">
+  This is a dangerous feature that can cause everything to explode.
+</Callout>
+```jsx showLineNumbers
+import { Callout } from 'nextra-theme-docs';
+
+<Callout type="error">
+  This is a dangerous feature that can cause everything to explode.
+</Callout>
+```
+
+## Tabs
+
+
+<Tabs items={['pnpm', 'npm', 'yarn']} defaultIndex="1">
+  <Tab>
+    **pNPM**: Fast, disk space efficient package manager.
+  </Tab>
+  <Tab>
+    **npm** is a package manager for the JavaScript programming language.
+  </Tab>
+  <Tab>
+    **Yarn** is a software packaging system.
+  </Tab>
+</Tabs>
+```jsx showLineNumbers
+import { Tab, Tabs } from 'nextra-theme-docs';
+
+<Tabs items={['pnpm', 'npm', 'yarn']} defaultIndex="1">
+  <Tab>
+    **pNPM**: Fast, disk space efficient package manager.
+  </Tab>
+  <Tab>
+    **npm** is a package manager for the JavaScript programming language.
+  </Tab>
+  <Tab>
+    **Yarn** is a software packaging system.
+  </Tab>
+</Tabs>
+```

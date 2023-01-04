@@ -1,0 +1,48 @@
+{
+  "name": "@trautmann/react-headless-table",
+  "version": "0.0.1",
+  "description": "Headless data table implementation, featuring pagination, rows selection, searching, sorting and more",
+  "keywords": ["react", "headless", "table", "context", "hooks", "search", "filter", "sort", "select", "pagination", "typescript"],
+  "repository": "https://react-headless-table.trautmann.software",
+  "homepage": "https://react-headless-table.trautmann.software",
+  "bugs": {
+    "url": "https://react-headless-table.trautmann.software"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Rashad Asgarbayli",
+    "email": "mail@trautmann.software",
+    "url": "https://rashad.asgarbayli.de"
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "rm -rf dist",
+    "build": "rm -rf dist && NODE_NO_WARNINGS=1 node build.mjs && tsc --emitDeclarationOnly",
+    "postbuild": "cp -f ../LICENSE LICENSE && cp -f ../README.md README.md",
+    "lint": "eslint --fix './src/**/*.ts*' && tsc --noEmit",
+    "test": "jest --colors --coverage test"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.2.4",
+    "@types/uuid": "^9.0.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/user-event": "^14.4.3",
+    "esbuild": "^0.16.12",
+    "jest": "^29.3.1",
+    "jest-environment-jsdom": "^29.3.1",
+    "react-dom": "^18.2.0",
+    "ts-jest": "^29.0.3"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "uuid": "^9.0.0"
+  }
+}
