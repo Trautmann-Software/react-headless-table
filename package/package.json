@@ -1,6 +1,6 @@
 {
   "name": "@trautmann/react-headless-table",
-  "version": "0.0.1",
+  "version": "0.0.2-0",
   "description": "Headless data table implementation, featuring pagination, rows selection, searching, sorting and more",
   "keywords": ["react", "headless", "table", "context", "hooks", "search", "filter", "sort", "select", "pagination", "typescript"],
   "repository": "https://react-headless-table.trautmann.software",
