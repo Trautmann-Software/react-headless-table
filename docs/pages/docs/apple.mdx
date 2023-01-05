@@ -1,1 +1,18 @@
-## Apple
+import { Table } from './components/table';
+//import { useSearchQuery } from '@trautmann/react-headless-table';
+
+export function TestComponent() {
+  //const { searchQuery, setSearchQuery } = useSearchQuery();
+
+  return (
+    <input
+      type="text"
+      //value={searchQuery}
+      //onChange={(event) => setSearchQuery(event.target.value)}
+    />
+  );
+}
+
+<Table searchQuery="abc">
+  <TestComponent />
+</Table>

@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { TestComponentProvider } from './test-component-provider';
 
-function TestComponent({prefix}: {prefix: string;}) {
+function TestComponent({ prefix }: { prefix: string }) {
   const { searchQuery, setSearchQuery } = useSearchQuery();
 
   return (
