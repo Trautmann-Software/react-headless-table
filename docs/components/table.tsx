@@ -31,26 +31,24 @@ export function Table<
       rows={otherProps.rows ?? []}
       searchQuery={otherProps.searchQuery ?? ''}
     >
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
       <div>
         <table>
           <thead>
-          <tr>
-            <td>H1</td>
-            <td>H2</td>
-          </tr>
+            <tr>
+              <td>H1</td>
+              <td>H2</td>
+            </tr>
           </thead>
           <tbody>
-          <tr>
-            <td>H1 1</td>
-            <td>H2 1</td>
-          </tr>
-          <tr>
-            <td>H1 2</td>
-            <td>H2 2</td>
-          </tr>
+            <tr>
+              <td>H1 1</td>
+              <td>H2 1</td>
+            </tr>
+            <tr>
+              <td>H1 2</td>
+              <td>H2 2</td>
+            </tr>
           </tbody>
         </table>
       </div>

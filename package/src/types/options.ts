@@ -105,8 +105,8 @@ export type UseOptions<
 > = { [Key in keyof CustomOptions]: Key extends undefined ? never : CustomOptions[Key] } & RecursiveRequired<
   Omit<Options<{}, CustomColumn, RowData>, 'internationalizationOptions'>
 > & {
-  /**
-   * Internationalization options for supported value types.
-   */
-  internationalizationOptions: InternationalizationOptions;
-};
+    /**
+     * Internationalization options for supported value types.
+     */
+    internationalizationOptions: InternationalizationOptions;
+  };
