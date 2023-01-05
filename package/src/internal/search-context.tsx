@@ -2,10 +2,11 @@ import { createContext, PropsWithChildren, useDeferredValue, useEffect, useMemo,
 import { noop } from '../utils';
 import { UseSearchQuery } from '../types';
 
-type SearchContextProps = Omit<UseSearchQuery, 'deferredSearchQuery'>;
+type SearchContextProps = UseSearchQuery;
 
 export const SearchContext = createContext<SearchContextProps>({
   searchQuery: '',
+  deferredSearchQuery: '',
   setSearchQuery: noop,
 });
 
@@ -14,11 +15,17 @@ type Props = PropsWithChildren<Pick<Partial<UseSearchQuery>, 'searchQuery'>>;
 export function SearchContextProvider({ children, searchQuery: passedQuery = '' }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const deferredSearchQuery = useDeferredValue(passedQuery);
-  useEffect(() => setSearchQuery(deferredSearchQuery), [deferredSearchQuery]);
+  const deferredPassedSearchQuery = useDeferredValue(passedQuery);
+  useEffect(() => setSearchQuery(deferredPassedSearchQuery), [deferredPassedSearchQuery]);
+
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   return useMemo(
-    () => <SearchContext.Provider value={{ searchQuery, setSearchQuery }}>{children}</SearchContext.Provider>,
-    [children, searchQuery]
+    () => (
+      <SearchContext.Provider value={{ searchQuery, deferredSearchQuery, setSearchQuery }}>
+        {children}
+      </SearchContext.Provider>
+    ),
+    [children, deferredSearchQuery, searchQuery]
   );
 }
