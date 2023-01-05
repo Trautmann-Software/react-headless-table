@@ -1,6 +1,6 @@
 {
   "name": "@trautmann/react-headless-table-monorepo",
-  "version": "0.0.1",
+  "version": "0.0.2-0",
   "description": "This is a monorepo; see src/package.json for more info",
   "private": true,
   "packageManager": "npm@9.2.0",
