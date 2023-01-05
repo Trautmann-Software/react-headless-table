@@ -14,7 +14,6 @@ export type OptionsContextProps<
 
 const defaultOptions: OptionsContextProps = {
   internationalizationOptions: {
-    locale: navigator.language,
     collatorOptions: {},
     numberFormatOptions: {},
     bigintFormatOptions: {},

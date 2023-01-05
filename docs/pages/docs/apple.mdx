@@ -1,15 +1,22 @@
 import { Table } from './components/table';
-//import { useSearchQuery } from '@trautmann/react-headless-table';
+import { useSearchQuery } from '@trautmann/react-headless-table';
 
 export function TestComponent() {
-  //const { searchQuery, setSearchQuery } = useSearchQuery();
+  const { searchQuery, deferredSearchQuery, setSearchQuery } = useSearchQuery();
 
   return (
+    <div>
+      <div>
     <input
       type="text"
-      //value={searchQuery}
-      //onChange={(event) => setSearchQuery(event.target.value)}
+      value={searchQuery}
+      onChange={(event) => setSearchQuery(event.target.value)}
     />
+      </div>
+      <div>
+        {deferredSearchQuery}
+      </div>
+    </div>
   );
 }
 

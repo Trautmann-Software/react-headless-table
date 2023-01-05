@@ -15,49 +15,49 @@ function TestComponent() {
       <ul role="internationalizationOptions">
         <li data-testid="internationalizationOptions-locale">{internationalizationOptions.locale}</li>
         <li data-testid="internationalizationOptions-collatorOptions">
-          {Object.entries(internationalizationOptions.collatorOptions)
+          {Object.entries(internationalizationOptions.collatorOptions ?? {})
             .map(([key, value]) => `${key}:${value}`)
             .sort()
             .join(',')}
         </li>
         <li data-testid="internationalizationOptions-numberFormatOptions">
-          {Object.entries(internationalizationOptions.numberFormatOptions)
+          {Object.entries(internationalizationOptions.numberFormatOptions ?? {})
             .map(([key, value]) => `${key}:${value}`)
             .sort()
             .join(',')}
         </li>
         <li data-testid="internationalizationOptions-bigintFormatOptions">
-          {Object.entries(internationalizationOptions.bigintFormatOptions)
+          {Object.entries(internationalizationOptions.bigintFormatOptions ?? {})
             .map(([key, value]) => `${key}:${value}`)
             .sort()
             .join(',')}
         </li>
         <li data-testid="internationalizationOptions-dateFormatOptions">
-          {Object.entries(internationalizationOptions.dateFormatOptions)
+          {Object.entries(internationalizationOptions.dateFormatOptions ?? {})
             .map(([key, value]) => `${key}:${value}`)
             .sort()
             .join(',')}
         </li>
         <li data-testid="internationalizationOptions-timeFormatOptions">
-          {Object.entries(internationalizationOptions.timeFormatOptions)
+          {Object.entries(internationalizationOptions.timeFormatOptions ?? {})
             .map(([key, value]) => `${key}:${value}`)
             .sort()
             .join(',')}
         </li>
         <li data-testid="internationalizationOptions-dateTimeFormatOptions">
-          {Object.entries(internationalizationOptions.dateTimeFormatOptions)
+          {Object.entries(internationalizationOptions.dateTimeFormatOptions ?? {})
             .map(([key, value]) => `${key}:${value}`)
             .sort()
             .join(',')}
         </li>
         <li data-testid="internationalizationOptions-relativeTimeFormatOptions">
-          {Object.entries(internationalizationOptions.relativeTimeFormatOptions)
+          {Object.entries(internationalizationOptions.relativeTimeFormatOptions ?? {})
             .map(([key, value]) => `${key}:${value}`)
             .sort()
             .join(',')}
         </li>
         <li data-testid="internationalizationOptions-booleanFormatOptions">
-          {Object.entries(internationalizationOptions.booleanFormatOptions)
+          {Object.entries(internationalizationOptions.booleanFormatOptions ?? {})
             .map(([key, value]) => `${key}:${value}`)
             .sort()
             .join(',')}

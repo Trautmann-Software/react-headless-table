@@ -11,7 +11,7 @@ export type InternationalizationOptions = {
    * Locale that can be used to set globally.
    * Can be overridden for columns individually in column definitions.
    * Used for compare functions on searching, filtering and sorting.
-   * @default navigator.language
+   * @default undefined
    */
   locale?: string;
   /**
@@ -105,8 +105,8 @@ export type UseOptions<
 > = { [Key in keyof CustomOptions]: Key extends undefined ? never : CustomOptions[Key] } & RecursiveRequired<
   Omit<Options<{}, CustomColumn, RowData>, 'internationalizationOptions'>
 > & {
-    /**
-     * Internationalization options for supported value types.
-     */
-    internationalizationOptions: Required<InternationalizationOptions>;
-  };
+  /**
+   * Internationalization options for supported value types.
+   */
+  internationalizationOptions: InternationalizationOptions;
+};
