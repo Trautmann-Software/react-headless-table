@@ -30,6 +30,7 @@ Use it in your code:
 import { ReactHeadlessTable } from '@trautmann/react-headless-table';
 // Coming soon
 ```
+
 Have a look at the available [component properties](https://react-headless-table.trautmann.software/docs/component-properties) and make sure to browse the comprehensive list of [usage examples](https://react-headless-table.trautmann.software/examples/basic-usage).
 
 ## Code contributors
