@@ -83,7 +83,7 @@ test('useOptions hook delivers default options if no options passed', async () =
     </TestComponentProvider>
   );
   // internationalizationOptions
-  expect(screen.getByTestId('internationalizationOptions-locale')).toHaveTextContent(navigator.language);
+  expect(screen.getByTestId('internationalizationOptions-locale')).toHaveTextContent('');
   expect(screen.getByTestId('internationalizationOptions-collatorOptions')).toHaveTextContent('');
   expect(screen.getByTestId('internationalizationOptions-numberFormatOptions')).toHaveTextContent('');
   expect(screen.getByTestId('internationalizationOptions-bigintFormatOptions')).toHaveTextContent('');

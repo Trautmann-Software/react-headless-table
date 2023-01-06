@@ -141,6 +141,7 @@ export function ColumnContextProvider<
     () =>
       deferredColumns.map((column, index) => ({
         ...(column as Column<RowData, CustomColumn>),
+        id: column.id ?? column.field,
         value: untypedValueFn(column),
         hidden: column.hidden ?? false,
         searchable: column.searchable ?? true,

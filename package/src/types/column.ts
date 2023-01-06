@@ -104,8 +104,14 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
     }
 ) & {
     /**
+     * Used as a key to reference the column itself.
+     * If not provided, then value of the `field`-attribute is used instead.
+     * Value of the id must be unique for each column!!!
+     */
+    id?: string;
+    /**
      * Used as a key to reference value in row data.
-     * The field is also serves to reference the column itself.
+     * The field also serves as a column ID to reference the column itself.
      * Value of the field must be unique for each column!!!
      * For a complex way of access to the cell value from row data see 'value'-attribute.
      */

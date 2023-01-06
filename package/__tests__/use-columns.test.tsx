@@ -15,6 +15,7 @@ const columns: Array<Column<Data, CustomColumn>> = [
   { field: 'time', type: 'time', customColumnField: 'customColumnFieldValue' },
   { field: 'date-time', type: 'date-time', customColumnField: 'customColumnFieldValue' },
   {
+    id: 'custom-id',
     field: 'relative-time',
     type: 'relative-time',
     relativeTimeFormatUnit: 'quarter',
@@ -38,7 +39,7 @@ function TestComponent() {
     <>
       <ul>
         {allColumns.map((column) => (
-          <li key={column.field} role="columns" data-testid={`column-${column.field}`}>
+          <li key={column.id} role="columns" data-testid={`column-${column.id}`}>
             <span role={column.customColumnField}>{column.customColumnField}</span>
             <span role={column.customOptionalColumnField}>{column.customOptionalColumnField}</span>
           </li>
@@ -46,14 +47,14 @@ function TestComponent() {
       </ul>
       <ul>
         {visibleColumns.map((column) => (
-          <li key={column.field} role="visible-columns" data-testid={`visible-column-${column.field}`}>
-            {column.field}
+          <li key={column.id} role="visible-columns" data-testid={`visible-column-${column.id}`}>
+            {column.id}
           </li>
         ))}
       </ul>
       <ul>
         {orderedVisibleColumns.map((column) => (
-          <li key={column.field} role="ordered-visible-columns" data-testid={`ordered-visible-column-${column.field}`}>
+          <li key={column.id} role="ordered-visible-columns" data-testid={`ordered-visible-column-${column.id}`}>
             {column.field}
           </li>
         ))}
@@ -85,20 +86,20 @@ test('useColumns hook delivers correct columns', async () => {
   // allColumns always contains all columns independent of everything
   let allColumns = screen.getAllByRole('columns');
   expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
+  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach(
     (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
   // visibleColumns contains only currently visible columns in the same order as allColumns
   let visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach((id, index) =>
+  ['string', 'multi-string', 'number', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach((id, index) =>
     expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   ['boolean'].forEach((id) => expect(screen.queryByTestId(`visible-column-${id}`)).not.toBeInTheDocument());
   // orderedVisibleColumns contains only currently visible columns ordered by currently order state
   let orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
   expect(orderedVisibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'number', 'date', 'time', 'date-time', 'relative-time', 'bigint'].forEach((id, index) =>
+  ['string', 'multi-string', 'number', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach((id, index) =>
     expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
   );
   ['boolean'].forEach((id) => expect(screen.queryByTestId(`ordered-visible-column-${id}`)).not.toBeInTheDocument());
@@ -108,19 +109,19 @@ test('useColumns hook delivers correct columns', async () => {
   // allColumns always contains all columns independent of everything
   allColumns = screen.getAllByRole('columns');
   expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
+  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach(
     (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
   // visibleColumns contains only currently visible columns in the same order as allColumns
   visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
+  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach(
     (id, index) => expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   // orderedVisibleColumns contains only currently visible columns ordered by currently order state
   orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
   expect(orderedVisibleColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'date', 'time', 'date-time', 'relative-time', 'bigint'].forEach(
+  ['string', 'multi-string', 'boolean', 'number', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach(
     (id, index) => expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
   );
 
@@ -129,20 +130,20 @@ test('useColumns hook delivers correct columns', async () => {
   // allColumns always contains all columns independent of everything
   allColumns = screen.getAllByRole('columns');
   expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
+  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach(
     (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
   // visibleColumns contains only currently visible columns in the same order as allColumns
   visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach((id, index) =>
+  ['string', 'multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach((id, index) =>
     expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   ['number'].forEach((id) => expect(screen.queryByTestId(`visible-column-${id}`)).not.toBeInTheDocument());
   // orderedVisibleColumns contains only currently visible columns ordered by currently order state
   orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
   expect(orderedVisibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'boolean', 'date', 'time', 'date-time', 'relative-time', 'bigint'].forEach((id, index) =>
+  ['string', 'multi-string', 'boolean', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach((id, index) =>
     expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
   );
   ['number'].forEach((id) => expect(screen.queryByTestId(`ordered-visible-column-${id}`)).not.toBeInTheDocument());
@@ -152,20 +153,20 @@ test('useColumns hook delivers correct columns', async () => {
   // allColumns always contains all columns independent of everything
   allColumns = screen.getAllByRole('columns');
   expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
+  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach(
     (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
   // visibleColumns contains only currently visible columns in the same order as allColumns
   visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(7);
-  ['multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach((id, index) =>
+  ['multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach((id, index) =>
     expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   ['string', 'number'].forEach((id) => expect(screen.queryByTestId(`visible-column-${id}`)).not.toBeInTheDocument());
   // orderedVisibleColumns contains only currently visible columns ordered by currently order state
   orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
   expect(orderedVisibleColumns).toHaveLength(7);
-  ['multi-string', 'boolean', 'date', 'time', 'date-time', 'relative-time', 'bigint'].forEach((id, index) =>
+  ['multi-string', 'boolean', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach((id, index) =>
     expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
   );
   ['string', 'number'].forEach((id) =>
@@ -177,44 +178,44 @@ test('useColumns hook delivers correct columns', async () => {
   // allColumns always contains all columns independent of everything
   allColumns = screen.getAllByRole('columns');
   expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
+  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach(
     (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
   // visibleColumns contains only currently visible columns in the same order as allColumns
   visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach((id, index) =>
+  ['string', 'multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach((id, index) =>
     expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   ['number'].forEach((id) => expect(screen.queryByTestId(`visible-column-${id}`)).not.toBeInTheDocument());
   // orderedVisibleColumns contains only currently visible columns ordered by currently order state
   orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
   expect(orderedVisibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'boolean', 'date', 'time', 'date-time', 'relative-time', 'bigint'].forEach((id, index) =>
+  ['string', 'multi-string', 'boolean', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach((id, index) =>
     expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
   );
   ['number'].forEach((id) => expect(screen.queryByTestId(`ordered-visible-column-${id}`)).not.toBeInTheDocument());
 
   // Swap the order of the columns: multi-string <=> bigint
   await userEvent.click(screen.getByRole('multi-string-and-bigint-fields'));
-  // New order: 'string', 'bigint', 'boolean', 'number', 'multi-string', 'date', 'time', 'date-time', 'relative-time'
+  // New order: 'string', 'bigint', 'boolean', 'number', 'multi-string', 'date', 'time', 'date-time', 'custom-id'
   // allColumns always contains all columns independent of everything
   allColumns = screen.getAllByRole('columns');
   expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
+  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach(
     (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
   // visibleColumns contains only currently visible columns in the same order as allColumns
   visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach((id, index) =>
+  ['string', 'multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'custom-id'].forEach((id, index) =>
     expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   ['number'].forEach((id) => expect(screen.queryByTestId(`visible-column-${id}`)).not.toBeInTheDocument());
   // orderedVisibleColumns contains only currently visible columns ordered by currently order state
   orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
   expect(orderedVisibleColumns).toHaveLength(8);
-  ['string', 'bigint', 'boolean', 'date', 'time', 'date-time', 'relative-time', 'multi-string'].forEach((id, index) =>
+  ['string', 'bigint', 'boolean', 'date', 'time', 'date-time', 'custom-id', 'multi-string'].forEach((id, index) =>
     expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
   );
   ['number'].forEach((id) => expect(screen.queryByTestId(`ordered-visible-column-${id}`)).not.toBeInTheDocument());
