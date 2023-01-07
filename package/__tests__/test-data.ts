@@ -15,3 +15,8 @@ export type CustomOptions<GenericColumn extends Record<string, any> = {}, RowDat
 
   customFn: (column: Column<GenericColumn>, row: Row<RowData>) => boolean;
 };
+
+export type CustomFilter = {
+  customFilterField: string;
+  customOptionalFilterField?: string;
+}

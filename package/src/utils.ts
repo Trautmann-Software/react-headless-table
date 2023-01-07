@@ -9,6 +9,7 @@ export const defined = <T>(value: T | undefined | null): value is T => typeof va
 export const equals = (a: Array<string>, b: Array<string>): boolean =>
   defined(a) && defined(b) && a.length === b.length && a.every((value, index) => b[index] === value);
 
+//#region Column['value']
 export function valueFn<RowData extends Record<string, any> = {}>(
   columnType: 'date' | 'time' | 'date-time',
   columnValueFn?: (row: Row<RowData>) => Date | undefined
@@ -85,6 +86,7 @@ export function untypedValueFn<RowData extends Record<string, any> = {}>(
   ) => (row: Row<RowData>) => (typeof column.value === 'function'
   ? column.value(row)
   : rowA.data?.[column.field as keyof RowData]);*/
+//#endregion Column['value']
 
 //#region Date/Time
 export const dateToNumber = (date: Date) =>
