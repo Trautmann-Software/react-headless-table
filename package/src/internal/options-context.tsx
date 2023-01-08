@@ -1,5 +1,6 @@
 import { createContext, PropsWithChildren, useDeferredValue, useMemo } from 'react';
 import { Options, UseOptions } from '../types';
+import { v4 as uuid } from 'uuid';
 
 /**
  * @template CustomOptions is the additional fields/attributes that were added into the options type definition.
@@ -11,6 +12,8 @@ export type OptionsContextProps<
   CustomColumn extends Record<string, any> = {},
   RowData extends Record<string, any> = {}
 > = UseOptions<CustomOptions, CustomColumn, RowData>;
+
+const idFn = () => uuid();
 
 const defaultOptions: OptionsContextProps = {
   internationalizationOptions: {
@@ -27,8 +30,9 @@ const defaultOptions: OptionsContextProps = {
       empty: '',
     },
   },
-  detailPanelOptions: {
-    behaviour: 'single',
+  rowOptions: {
+    idFn,
+    detailsPanelType: 'single',
   },
 };
 
@@ -66,9 +70,9 @@ export function OptionsContextProvider<
         ...defaultOptions.internationalizationOptions,
         ...(deferredOptions?.internationalizationOptions ?? {}),
       },
-      detailPanelOptions: {
-        ...defaultOptions.detailPanelOptions,
-        ...(deferredOptions?.detailPanelOptions ?? {}),
+      rowOptions: {
+        ...defaultOptions.rowOptions,
+        ...(deferredOptions?.rowOptions ?? {}),
       },
     }),
     [deferredOptions]

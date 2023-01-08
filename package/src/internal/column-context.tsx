@@ -1,8 +1,9 @@
 import { createContext, PropsWithChildren, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
-import { Column, ExtendedColumn, Row, UseColumns } from '../types';
+import { Column, ExtendedColumn, Row, SortingDirection, UseColumns } from '../types';
 import {
   datetimeToNumber,
   dateToNumber,
+  defined,
   generateString,
   GenerateStringOptions,
   getNextSortingDirection,
@@ -105,36 +106,51 @@ export function ColumnContextProvider<
     [internationalizationOptions.collatorOptions, internationalizationOptions.locale]
   );
   const builtInSortFn = useCallback<
-    (column: Column<RowData, CustomColumn>) => (a: Row<RowData>, b: Row<RowData>) => number
+    (
+      column: Column<RowData, CustomColumn>
+    ) => (a: Row<RowData>, b: Row<RowData>, sortingDirection: SortingDirection) => number
   >(
-    (column) => (a, b) => {
+    (column) => (a, b, sortingDirection) => {
+      if (!defined(sortingDirection)) {
+        return 0;
+      }
+      const directionMultiplicative = sortingDirection === 'asc' ? 1 : -1;
       switch (column.type) {
         case 'string':
         case 'multi-string':
         case 'boolean':
-          return compareStrings(
-            generateString(a, column, generateStringOptions(column)),
-            generateString(b, column, generateStringOptions(column))
+          return (
+            directionMultiplicative *
+            compareStrings(
+              generateString(a, column, generateStringOptions(column)),
+              generateString(b, column, generateStringOptions(column))
+            )
           );
         case 'number':
         case 'relative-time':
-          return (valueFn(column.type, column.value)(a) ?? 0) - (valueFn(column.type, column.value)(b) ?? 0);
+          return (
+            directionMultiplicative *
+            ((valueFn(column.type, column.value)(a) ?? 0) - (valueFn(column.type, column.value)(b) ?? 0))
+          );
         case 'bigint':
           const difference =
             (valueFn(column.type, column.value)(a) ?? 0n) - (valueFn(column.type, column.value)(b) ?? 0n);
-          return difference === 0n ? 0 : difference > 0n ? 1 : -1;
+          return difference === 0n ? 0 : directionMultiplicative * (difference > 0n ? 1 : -1);
         case 'date':
           return (
-            dateToNumber(valueFn(column.type, column.value)(a)) - dateToNumber(valueFn(column.type, column.value)(b))
+            directionMultiplicative *
+            (dateToNumber(valueFn(column.type, column.value)(a)) - dateToNumber(valueFn(column.type, column.value)(b)))
           );
         case 'time':
           return (
-            timeToNumber(valueFn(column.type, column.value)(a)) - timeToNumber(valueFn(column.type, column.value)(b))
+            directionMultiplicative *
+            (timeToNumber(valueFn(column.type, column.value)(a)) - timeToNumber(valueFn(column.type, column.value)(b)))
           );
         case 'date-time':
           return (
-            datetimeToNumber(valueFn(column.type, column.value)(a)) -
-            datetimeToNumber(valueFn(column.type, column.value)(b))
+            directionMultiplicative *
+            (datetimeToNumber(valueFn(column.type, column.value)(a)) -
+              datetimeToNumber(valueFn(column.type, column.value)(b)))
           );
         default:
           return 0;
@@ -152,8 +168,9 @@ export function ColumnContextProvider<
         value: untypedValueFn(column),
         hidden: column.hidden ?? false,
         searchable: column.searchable ?? true,
-        searchFn: column.searchFn ?? builtInSearchFn(column),
-        sortFn: column.sortFn ?? builtInSortFn(column),
+        searchFn: column.searchFn ?? builtInSearchFn({ ...column, value: untypedValueFn(column) }),
+        sortingDirection: column.sortingDirection ?? undefined,
+        sortFn: column.sortFn ?? builtInSortFn({ ...column, value: untypedValueFn(column) }),
         order: column.order ?? order,
       } as ExtendedColumn<RowData, CustomColumn>),
     [builtInSearchFn, builtInSortFn]

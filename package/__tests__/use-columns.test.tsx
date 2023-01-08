@@ -27,15 +27,10 @@ const testColumns: Array<Column<Data, CustomColumn>> = [
 ];
 
 function TestComponent() {
-  const {
-    columns,
-    hideColumn,
-    showColumn,
-    toggleColumnVisibility,
-    swapColumnOrder,
-    sort,
-    toggleSort,
-  } = useColumns<Data, CustomColumn>();
+  const { columns, hideColumn, showColumn, toggleColumnVisibility, swapColumnOrder, sort, toggleSort } = useColumns<
+    Data,
+    CustomColumn
+  >();
 
   return (
     <>

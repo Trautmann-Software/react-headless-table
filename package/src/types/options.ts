@@ -1,5 +1,3 @@
-import { RecursiveRequired } from './utility-types';
-
 export type BooleanFormatOptions = {
   true: string;
   false: string;
@@ -58,13 +56,19 @@ export type InternationalizationOptions = {
   booleanFormatOptions?: BooleanFormatOptions;
 };
 
-export type DetailPanelOptions = {
+export type RowOptions<RowData extends Record<string, any> = {}> = {
+  /**
+   * ID generation strategy for rows.
+   * @param rowData is the representation of a row data.
+   * @default `uuid.v4()` from `uuid` package.
+   */
+  idFn?: (rowData: RowData) => string;
   /**
    * Detail panel visibility type.
    * Defines whether a single panel at the same time can be showed or multiple panels from different rows.
    * @default 'single'
    */
-  behaviour?: 'single' | 'multiple';
+  detailsPanelType?: 'single' | 'multiple';
 };
 
 /**
@@ -86,9 +90,9 @@ export type Options<
    */
   internationalizationOptions?: InternationalizationOptions;
   /**
-   * Detail panel options.
+   * Row related options.
    */
-  detailPanelOptions?: DetailPanelOptions;
+  rowOptions?: RowOptions;
 };
 
 /**
@@ -100,13 +104,17 @@ export type Options<
  */
 export type UseOptions<
   CustomOptions extends Record<string, any> = {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   CustomColumn extends Record<string, any> = {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   RowData extends Record<string, any> = {}
-> = { [Key in keyof CustomOptions]: Key extends undefined ? never : CustomOptions[Key] } & RecursiveRequired<
-  Omit<Options<{}, CustomColumn, RowData>, 'internationalizationOptions'>
-> & {
-    /**
-     * Internationalization options for supported value types.
-     */
-    internationalizationOptions: InternationalizationOptions;
-  };
+> = { [Key in keyof CustomOptions]: Key extends undefined ? never : CustomOptions[Key] } & {
+  /**
+   * Internationalization options for supported value types.
+   */
+  internationalizationOptions: InternationalizationOptions;
+  /**
+   * Row related options.
+   */
+  rowOptions: Required<RowOptions>;
+};

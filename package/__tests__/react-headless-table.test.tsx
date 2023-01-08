@@ -101,7 +101,7 @@ export const rows: Array<RowData> = [
 function TestComponent() {
   const { searchQuery, setSearchQuery } = useSearchQuery();
   const { columns } = useColumns<RowData>();
-  const { sortedRows } = useRows<RowData>();
+  const { rows } = useRows<RowData>();
   return (
     <>
       <input
@@ -121,7 +121,7 @@ function TestComponent() {
           </tr>
         </thead>
         <tbody>
-          {sortedRows.map((row) => (
+          {rows.map((row) => (
             <tr key={row.id} role="table-row" data-testid={`table-row-${row.data.stringField}`}>
               {columns.map(({ field, value }) => (
                 <td

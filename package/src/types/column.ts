@@ -142,7 +142,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
     /**
      * Overrides the sort algorithm for this column.
      */
-    sortFn?: (a: Row<RowData>, b: Row<RowData>) => number;
+    sortFn?: (a: Row<RowData>, b: Row<RowData>, sortingDirection?: SortingDirection) => number;
     /**
      * Initial order index of this column.
      * If not provided, array index is used!!!

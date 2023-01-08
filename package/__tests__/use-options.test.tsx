@@ -5,11 +5,7 @@ import { CustomColumn, CustomOptions, Data } from './test-data';
 import { useOptions } from '../src/hooks/use-options';
 
 function TestComponent() {
-  const { internationalizationOptions, detailPanelOptions, ...customOptions } = useOptions<
-    Data,
-    CustomColumn,
-    CustomOptions
-  >();
+  const { internationalizationOptions, rowOptions, ...customOptions } = useOptions<Data, CustomColumn, CustomOptions>();
   return (
     <>
       <ul role="internationalizationOptions">
@@ -63,8 +59,8 @@ function TestComponent() {
             .join(',')}
         </li>
       </ul>
-      <ul role="detailPanelOptions">
-        <li data-testid="detailPanelOptions-behaviour">{detailPanelOptions.behaviour}</li>
+      <ul role="rowOptions">
+        <li data-testid="rowOptions-detailsPanelType">{rowOptions.detailsPanelType}</li>
       </ul>
       <p role="customOptions" data-testid="customOptions">
         {Object.entries(customOptions)
@@ -94,8 +90,8 @@ test('useOptions hook delivers default options if no options passed', async () =
   expect(screen.getByTestId('internationalizationOptions-booleanFormatOptions')).toHaveTextContent(
     'empty:,false:false,true:true'
   );
-  // detailPanelOptions
-  expect(screen.getByTestId('detailPanelOptions-behaviour')).toHaveTextContent('single');
+  // rowOptions
+  expect(screen.getByTestId('rowOptions-detailsPanelType')).toHaveTextContent('single');
 });
 
 test('useOptions hook delivers default options merged with option overrides', async () => {
@@ -136,8 +132,8 @@ test('useOptions hook delivers default options merged with option overrides', as
             empty: 'unknown',
           },
         },
-        detailPanelOptions: {
-          behaviour: 'multiple',
+        rowOptions: {
+          detailsPanelType: 'multiple',
         },
       }}
     >
@@ -162,8 +158,8 @@ test('useOptions hook delivers default options merged with option overrides', as
   expect(screen.getByTestId('internationalizationOptions-booleanFormatOptions')).toHaveTextContent(
     'empty:unknown,false:no,true:yes'
   );
-  // detailPanelOptions
-  expect(screen.getByTestId('detailPanelOptions-behaviour')).toHaveTextContent('multiple');
+  // rowOptions
+  expect(screen.getByTestId('rowOptions-detailsPanelType')).toHaveTextContent('multiple');
 });
 
 test('useOptions hook delivers default options merged with option overrides', async () => {
@@ -174,8 +170,8 @@ test('useOptions hook delivers default options merged with option overrides', as
         customOptionField: 'customValue',
         customOptionalOptionField: 'customOptionsValue',
         customFn: (column, row) => !!column && !!row.data,
-        detailPanelOptions: {
-          behaviour: 'multiple',
+        rowOptions: {
+          detailsPanelType: 'multiple',
         },
       }}
     >
@@ -186,6 +182,6 @@ test('useOptions hook delivers default options merged with option overrides', as
   expect(screen.getByTestId('customOptions')).toHaveTextContent(
     'customOptionField:customValue,customOptionalOptionField:customOptionsValue'
   );
-  // detailPanelOptions
-  expect(screen.getByTestId('detailPanelOptions-behaviour')).toHaveTextContent('multiple');
+  // rowOptions
+  expect(screen.getByTestId('rowOptions-detailsPanelType')).toHaveTextContent('multiple');
 });

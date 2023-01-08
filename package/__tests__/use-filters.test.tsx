@@ -24,7 +24,7 @@ function TestComponent() {
         onClick={() =>
           addFilter({
             id: 'added',
-            chainAs: 'OR',
+            chainAs: 'SHOULD',
             columnId: 'column-add',
             operator: () => true,
             customFilterField: 'custom-field',
@@ -39,7 +39,7 @@ function TestComponent() {
         onClick={() =>
           updateFilter({
             id: 'added',
-            chainAs: 'AND',
+            chainAs: 'MUST',
             columnId: 'column-add',
             operator: () => true,
             customFilterField: 'updated-custom-field',

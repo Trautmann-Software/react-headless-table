@@ -50,7 +50,7 @@ export function FilterContextProvider<
   const [filters, setFilters] = useState<Array<Filter<CustomFilter, RowData>>>([]);
 
   const extendFilter = useCallback<(filter: Filter<CustomFilter, RowData>) => Filter<CustomFilter, RowData>>(
-    (filter) => ({ ...filter, id: filter.id ?? uuid(), chainAs: filter.chainAs ?? 'AND' }),
+    (filter) => ({ ...filter, id: filter.id ?? uuid(), chainAs: filter.chainAs ?? 'MUST' }),
     []
   );
   useEffect(() => setFilters((deferredPassedFilters ?? []).map(extendFilter)), [deferredPassedFilters, extendFilter]);
@@ -64,7 +64,7 @@ export function FilterContextProvider<
           {
             ...filter,
             id: filter.id ?? uuid(),
-            chainAs: filter.chainAs ?? 'AND',
+            chainAs: filter.chainAs ?? 'MUST',
           },
         ]);
       });
@@ -80,7 +80,7 @@ export function FilterContextProvider<
               ? {
                   ...filter,
                   id: filter.id ?? uuid(),
-                  chainAs: filter.chainAs ?? 'AND',
+                  chainAs: filter.chainAs ?? 'MUST',
                 }
               : existingFilter
           )

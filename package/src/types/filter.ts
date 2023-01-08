@@ -23,9 +23,11 @@ export type Filter<CustomFilter extends Record<string, any> = {}, RowData extend
   operator: (row: Row<RowData>) => boolean;
   /**
    * Defines how this filter should be chained with other filters.
-   * @default 'AND'
+   * 'MUST' - These filters must match, like logical AND.
+   * 'SHOULD' - At least one of these filters must match, like logical OR.
+   * @default 'MUST'
    */
-  chainAs?: 'AND' | 'OR';
+  chainAs?: 'MUST' | 'SHOULD';
 };
 
 /**
