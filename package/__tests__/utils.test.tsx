@@ -1,4 +1,13 @@
-import { datetimeToNumber, dateToNumber, defined, equals, generateString, noop, timeToNumber } from '../src/utils';
+import {
+  datetimeToNumber,
+  dateToNumber,
+  defined,
+  equals,
+  generateString,
+  getNextSortingDirection,
+  noop,
+  timeToNumber,
+} from '../src/utils';
 import { Data } from './test-data';
 
 test('utils noop', async () => {
@@ -19,6 +28,12 @@ test('utils equals', async () => {
   expect(equals(['abc', 'xyz'], [])).toBeFalsy();
   expect(equals(['abc', 'xyz'], ['xyz', 'abc'])).toBeFalsy();
   expect(equals(['abc', 'xyz'], ['abc', 'xyz'])).toBeTruthy();
+});
+
+test('utils getNextSortingDirection', async () => {
+  expect(getNextSortingDirection('asc')).toBe('desc');
+  expect(getNextSortingDirection('desc')).toBe(undefined);
+  expect(getNextSortingDirection(undefined)).toBe('asc');
 });
 
 //#region Date & Time

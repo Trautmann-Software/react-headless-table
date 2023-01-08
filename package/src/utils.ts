@@ -70,8 +70,6 @@ export function valueFn<RowData extends Record<string, any> = {}>(
     case 'boolean':
       return (row: Row<RowData>) =>
         (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as boolean | undefined;
-    default:
-      return (row: Row<RowData>) => (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as undefined;
   }
 }
 
@@ -216,9 +214,6 @@ export function generateString<RowData extends Record<string, any> = {}>(
       );
     case 'boolean':
       return generateForBoolean(valueFn(column.type, column.value)(row), options.booleanFormatOptions);
-    default:
-      return '';
   }
 }
-
 //#endregion Stringify
