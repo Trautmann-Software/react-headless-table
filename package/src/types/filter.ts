@@ -38,5 +38,5 @@ export type UseFilters<CustomFilter extends Record<string, any> = {}, RowData ex
   addFilter: (filter: Filter<CustomFilter, RowData>) => void;
   updateFilter: (filter: Filter<CustomFilter, RowData>) => void;
   removeFilter: (filterId: string) => void;
-  inProgress: boolean;
+  isFiltersUpdatePending: boolean;
 };

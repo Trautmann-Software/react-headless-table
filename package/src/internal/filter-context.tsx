@@ -1,14 +1,14 @@
 import {
   createContext,
-  Dispatch,
   PropsWithChildren,
-  SetStateAction,
+  useCallback,
   useDeferredValue,
   useEffect,
   useMemo,
   useState,
+  useTransition,
 } from 'react';
-import { Filter } from '../types/filter';
+import { Filter, UseFilters } from '../types/filter';
 import { v4 as uuid } from 'uuid';
 import { noop } from '../utils';
 
@@ -19,14 +19,14 @@ import { noop } from '../utils';
 export type FilterContextProps<
   CustomFilter extends Record<string, any> = {},
   RowData extends Record<string, any> = {}
-> = {
-  filters: Array<Filter<CustomFilter, RowData>>;
-  setFilters: Dispatch<SetStateAction<Array<Filter<CustomFilter, RowData>>>>;
-};
+> = UseFilters<CustomFilter, RowData>;
 
 export const FilterContext = createContext<FilterContextProps>({
   filters: [],
-  setFilters: noop,
+  addFilter: noop,
+  updateFilter: noop,
+  removeFilter: noop,
+  isFiltersUpdatePending: false,
 });
 
 type Props<
@@ -45,31 +45,67 @@ export function FilterContextProvider<
   RowData extends Record<string, any> = {}
 >(props: Props<CustomFilter, RowData>) {
   const { children, filters: passedFilters } = props;
+  const deferredPassedFilters = useDeferredValue(passedFilters);
+
   const [filters, setFilters] = useState<Array<Filter<CustomFilter, RowData>>>([]);
 
-  const deferredFilters = useDeferredValue(passedFilters);
-  const extendedFilters = useMemo<Array<Filter<CustomFilter, RowData>>>(
-    () =>
-      (deferredFilters ?? []).map((filter) => ({
-        ...filter,
-        id: filter.id ?? uuid(),
-        chainAs: filter.chainAs ?? 'AND',
-      })),
-    [deferredFilters]
+  const extendFilter = useCallback<(filter: Filter<CustomFilter, RowData>) => Filter<CustomFilter, RowData>>(
+    (filter) => ({ ...filter, id: filter.id ?? uuid(), chainAs: filter.chainAs ?? 'AND' }),
+    []
   );
-  const deferredExtendedFilters = useDeferredValue(extendedFilters);
-  useEffect(() => setFilters(deferredExtendedFilters), [deferredExtendedFilters]);
+  useEffect(() => setFilters((deferredPassedFilters ?? []).map(extendFilter)), [deferredPassedFilters, extendFilter]);
+
+  const [isFiltersUpdatePending, startFiltersUpdateTransition] = useTransition();
+  const addFilter = useCallback<UseFilters<CustomFilter, RowData>['addFilter']>(
+    (filter) => {
+      startFiltersUpdateTransition(() => {
+        setFilters((currentFilters) => [
+          ...currentFilters,
+          {
+            ...filter,
+            id: filter.id ?? uuid(),
+            chainAs: filter.chainAs ?? 'AND',
+          },
+        ]);
+      });
+    },
+    [setFilters]
+  );
+  const updateFilter = useCallback<UseFilters<CustomFilter, RowData>['updateFilter']>(
+    (filter) => {
+      startFiltersUpdateTransition(() => {
+        setFilters((currentFilters) =>
+          currentFilters.map((existingFilter) =>
+            existingFilter.id === filter.id
+              ? {
+                  ...filter,
+                  id: filter.id ?? uuid(),
+                  chainAs: filter.chainAs ?? 'AND',
+                }
+              : existingFilter
+          )
+        );
+      });
+    },
+    [setFilters]
+  );
+  const removeFilter = useCallback<UseFilters<CustomFilter, RowData>['removeFilter']>(
+    (filterId) => {
+      startFiltersUpdateTransition(() => {
+        setFilters((currentFilters) => currentFilters.filter(({ id }) => id !== filterId));
+      });
+    },
+    [setFilters]
+  );
 
   return useMemo(
     () => (
-      <FilterContext.Provider
-        // eslint-disable-next-line
-        // @ts-ignore
-        value={{ filters, setFilters }}
-      >
+      // eslint-disable-next-line
+      // @ts-ignore
+      <FilterContext.Provider value={{ filters, addFilter, updateFilter, removeFilter, isFiltersUpdatePending }}>
         {children}
       </FilterContext.Provider>
     ),
-    [children, filters]
+    [addFilter, children, filters, isFiltersUpdatePending, removeFilter, updateFilter]
   );
 }
