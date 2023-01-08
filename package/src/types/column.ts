@@ -1,6 +1,8 @@
 import { Row } from './row';
 import { BooleanFormatOptions } from './options';
 
+export type SortingDirection = 'asc' | 'desc' | undefined;
+
 /**
  * An extendable column.
  * Column can be extended with additional fields if necessary.
@@ -133,6 +135,11 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
      */
     searchFn?: (term: string, row: Row<RowData>) => boolean;
     /**
+     * Initial sorting direction for the column.
+     * @default undefined
+     */
+    sortingDirection?: SortingDirection;
+    /**
      * Overrides the sort algorithm for this column.
      */
     sortFn?: (a: Row<RowData>, b: Row<RowData>) => number;
@@ -151,7 +158,8 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
  */
 export type ExtendedColumn<RowData extends Record<string, any> = {}, CustomColumn extends Record<string, any> = {}> = {
   [Key in keyof CustomColumn]: Key extends undefined ? never : CustomColumn[Key];
-} & Required<Column<RowData>>;
+} & Required<Omit<Column<RowData>, 'sortingDirection'>> &
+  Pick<Column<RowData>, 'sortingDirection'>;
 
 /**
  * Delivers Extended column information and functionality to work with column entries.
@@ -176,15 +184,16 @@ export type UseColumns<RowData extends Record<string, any> = {}, CustomColumn ex
    */
   toggleColumnVisibility: (columnId: string) => void;
   /**
-   * Column visibility change is done as a transaction. This attribute mirrors the transaction state.
-   */
-  isColumnVisibilityChangePending: boolean;
-  /**
    * Swaps `order` attributes for the given column IDs.
    */
   swapColumnOrder: (columnId1: string, columnId2: string) => void;
   /**
-   * Column order change is done as a transaction. This attribute mirrors the transaction state.
+   * Sets `sortingDirection` attribute to the give one for the given column ID, and resets to undefined for all other columns.
    */
-  isSwapColumnOrderPending: boolean;
+  sort: (columnId: string, sortingDirection: SortingDirection) => void;
+  /**
+   * Sets `sortingDirection` attribute to the next one for the given column ID, and resets to undefined for all other columns.
+   * Sequence: 'asc' => 'desc' => undefined => 'asc'
+   */
+  toggleSort: (columnId: string) => void;
 };

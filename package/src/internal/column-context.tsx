@@ -1,19 +1,11 @@
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from 'react';
+import { createContext, PropsWithChildren, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { Column, ExtendedColumn, Row, UseColumns } from '../types';
 import {
   datetimeToNumber,
   dateToNumber,
   generateString,
   GenerateStringOptions,
+  getNextSortingDirection,
   noop,
   timeToNumber,
   untypedValueFn,
@@ -35,9 +27,9 @@ export const ColumnContext = createContext<ColumnContextProps>({
   hideColumn: noop,
   showColumn: noop,
   toggleColumnVisibility: noop,
-  isColumnVisibilityChangePending: false,
   swapColumnOrder: noop,
-  isSwapColumnOrderPending: false,
+  sort: noop,
+  toggleSort: noop,
 });
 
 type Props<
@@ -177,9 +169,8 @@ export function ColumnContextProvider<
   //#endregion Extend columns
 
   //#region Column re-ordering
-  const [isSwapColumnOrderPending, startSwapColumnOrderTransition] = useTransition();
-  const swapColumnOrder = useCallback<UseColumns<RowData, CustomColumn>['swapColumnOrder']>((columnId1, columnId2) => {
-    startSwapColumnOrderTransition(() => {
+  const swapColumnOrder = useCallback<UseColumns<RowData, CustomColumn>['swapColumnOrder']>(
+    (columnId1, columnId2) =>
       setColumns((previousColumns) => {
         const order1 = previousColumns.find((column) => column.id === columnId1)?.order as number;
         const order2 = previousColumns.find((column) => column.id === columnId2)?.order as number;
@@ -192,15 +183,14 @@ export function ColumnContextProvider<
             } else return column;
           })
           .sort((a, b) => a.order - b.order);
-      });
-    });
-  }, []);
+      }),
+    []
+  );
   //#endregion Column re-ordering
 
   //#region Column visibility
-  const [isColumnVisibilityChangePending, startColumnVisibilityChangeTransition] = useTransition();
-  const hideColumn = useCallback<UseColumns<RowData, CustomColumn>['hideColumn']>((columnId) => {
-    startColumnVisibilityChangeTransition(() => {
+  const hideColumn = useCallback<UseColumns<RowData, CustomColumn>['hideColumn']>(
+    (columnId) =>
       setColumns((previousColumns) =>
         previousColumns.map((column) =>
           column.id === columnId
@@ -210,11 +200,11 @@ export function ColumnContextProvider<
               }
             : column
         )
-      );
-    });
-  }, []);
-  const showColumn = useCallback<UseColumns<RowData, CustomColumn>['showColumn']>((columnId) => {
-    startColumnVisibilityChangeTransition(() => {
+      ),
+    []
+  );
+  const showColumn = useCallback<UseColumns<RowData, CustomColumn>['showColumn']>(
+    (columnId) =>
       setColumns((currentColumns) =>
         currentColumns.map((column) =>
           column.id === columnId
@@ -224,27 +214,47 @@ export function ColumnContextProvider<
               }
             : column
         )
-      );
-    });
-  }, []);
+      ),
+    []
+  );
   const toggleColumnVisibility = useCallback<UseColumns<RowData, CustomColumn>['toggleColumnVisibility']>(
-    (columnId) => {
-      startColumnVisibilityChangeTransition(() => {
-        setColumns((currentColumns) =>
-          currentColumns.map((column) =>
-            column.id === columnId
-              ? {
-                  ...column,
-                  hidden: !column.hidden,
-                }
-              : column
-          )
-        );
-      });
-    },
+    (columnId) =>
+      setColumns((currentColumns) =>
+        currentColumns.map((column) =>
+          column.id === columnId
+            ? {
+                ...column,
+                hidden: !column.hidden,
+              }
+            : column
+        )
+      ),
     []
   );
   //#endregion Column visibility
+
+  //#region Sorting Direction
+  const sort = useCallback<UseColumns<RowData, CustomColumn>['sort']>(
+    (columnId, sortingDirection) =>
+      setColumns((previousColumns) =>
+        previousColumns.map((column) =>
+          column.id === columnId ? { ...column, sortingDirection } : { ...column, sortingDirection: undefined }
+        )
+      ),
+    []
+  );
+  const toggleSort = useCallback<UseColumns<RowData, CustomColumn>['toggleSort']>(
+    (columnId) =>
+      setColumns((previousColumns) =>
+        previousColumns.map((column) =>
+          column.id === columnId
+            ? { ...column, sortingDirection: getNextSortingDirection(column.sortingDirection) }
+            : { ...column, sortingDirection: undefined }
+        )
+      ),
+    []
+  );
+  //#endregion Sorting Direction
 
   return useMemo(
     () => (
@@ -256,23 +266,14 @@ export function ColumnContextProvider<
           hideColumn,
           showColumn,
           toggleColumnVisibility,
-          isSwapColumnOrderPending,
           swapColumnOrder,
-          isColumnVisibilityChangePending,
+          sort,
+          toggleSort,
         }}
       >
         {children}
       </ColumnContext.Provider>
     ),
-    [
-      children,
-      columns,
-      hideColumn,
-      isColumnVisibilityChangePending,
-      isSwapColumnOrderPending,
-      showColumn,
-      swapColumnOrder,
-      toggleColumnVisibility,
-    ]
+    [children, columns, hideColumn, showColumn, sort, swapColumnOrder, toggleColumnVisibility, toggleSort]
   );
 }

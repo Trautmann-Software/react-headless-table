@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { TestComponentProvider } from './test-component-provider';
 import { CustomColumn, Data } from './test-data';
-import { useMemo } from 'react';
+import { defined } from '../src/utils';
 
 const testColumns: Array<Column<Data, CustomColumn>> = [
   { field: 'string', type: 'string', customColumnField: 'customColumnFieldValue' },
@@ -20,15 +20,22 @@ const testColumns: Array<Column<Data, CustomColumn>> = [
     field: 'relative-time',
     type: 'relative-time',
     relativeTimeFormatUnit: 'quarter',
+    sortingDirection: 'asc',
     customColumnField: 'customColumnFieldValue',
     customOptionalColumnField: 'customOptionalColumnFieldValue',
   },
 ];
 
 function TestComponent() {
-  const { columns, hideColumn, showColumn, toggleColumnVisibility, swapColumnOrder } = useColumns<Data, CustomColumn>();
-
-  const visibleColumns = useMemo(() => columns.filter(({ hidden }) => !hidden), [columns]);
+  const {
+    columns,
+    hideColumn,
+    showColumn,
+    toggleColumnVisibility,
+    swapColumnOrder,
+    sort,
+    toggleSort,
+  } = useColumns<Data, CustomColumn>();
 
   return (
     <>
@@ -41,11 +48,22 @@ function TestComponent() {
         ))}
       </ul>
       <ul>
-        {visibleColumns.map((column) => (
-          <li key={column.id} role="visible-columns" data-testid={`visible-column-${column.id}`}>
-            {column.id}
-          </li>
-        ))}
+        {columns
+          .filter(({ hidden }) => !hidden)
+          .map((column) => (
+            <li key={column.id} role="visible-columns" data-testid={`visible-column-${column.id}`}>
+              {column.id}
+            </li>
+          ))}
+      </ul>
+      <ul>
+        {columns
+          .filter(({ sortingDirection }) => defined(sortingDirection))
+          .map((column) => (
+            <li key={column.id} role="sorted-columns" data-testid={`sorted-column-${column.id}`}>
+              {column.sortingDirection}
+            </li>
+          ))}
       </ul>
 
       <button role="show-boolean-field" onClick={() => showColumn('boolean')}>
@@ -59,6 +77,13 @@ function TestComponent() {
       </button>
       <button role="multi-string-and-bigint-fields" onClick={() => swapColumnOrder('multi-string', 'bigint')}>
         multi-string-and-bigint-fields
+      </button>
+      {/* Sorting */}
+      <button role="sort-string" onClick={() => sort('string', 'desc')}>
+        sort-string
+      </button>
+      <button role="toggle-sort-string" onClick={() => toggleSort('string')}>
+        toggle-sort-string
       </button>
     </>
   );
@@ -168,4 +193,15 @@ test('useColumns hook delivers correct columns', async () => {
   // Custom column fields
   expect(screen.getAllByRole('customColumnFieldValue')).toHaveLength(9);
   expect(screen.getAllByRole('customOptionalColumnFieldValue')).toHaveLength(1);
+
+  // Sorting state
+  expect(screen.getAllByRole('sorted-columns')).toHaveLength(1);
+  expect(screen.getByTestId('sorted-column-custom-id')).toHaveTextContent('asc');
+  // Change sorting to column 'string'
+  await userEvent.click(screen.getByRole('sort-string'));
+  expect(screen.getAllByRole('sorted-columns')).toHaveLength(1);
+  expect(screen.getByTestId('sorted-column-string')).toHaveTextContent('desc');
+  // Remove sorting from column 'string'
+  await userEvent.click(screen.getByRole('toggle-sort-string'));
+  expect(screen.queryAllByRole('sorted-columns')).toHaveLength(0);
 });

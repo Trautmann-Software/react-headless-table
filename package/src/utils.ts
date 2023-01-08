@@ -1,4 +1,4 @@
-import { BooleanFormatOptions, Column, ExtendedColumn, Row } from './types';
+import { BooleanFormatOptions, Column, ExtendedColumn, Row, SortingDirection } from './types';
 
 export const noop = (): void => {
   return undefined;
@@ -8,6 +8,16 @@ export const defined = <T>(value: T | undefined | null): value is T => typeof va
 
 export const equals = (a: Array<string>, b: Array<string>): boolean =>
   defined(a) && defined(b) && a.length === b.length && a.every((value, index) => b[index] === value);
+
+export const getNextSortingDirection = (sortingDirection: SortingDirection): SortingDirection => {
+  if (sortingDirection === 'asc') {
+    return 'desc';
+  } else if (sortingDirection === 'desc') {
+    return undefined;
+  } else {
+    return 'asc';
+  }
+};
 
 //#region Column['value']
 export function valueFn<RowData extends Record<string, any> = {}>(
