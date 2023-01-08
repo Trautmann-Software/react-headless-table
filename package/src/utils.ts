@@ -20,79 +20,11 @@ export const getNextSortingDirection = (sortingDirection: SortingDirection): Sor
 };
 
 //#region Column['value']
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'date' | 'time' | 'date-time',
-  columnValueFn?: (row: Row<RowData>) => Date | undefined
-): (row: Row<RowData>) => Date | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'number' | 'relative-time',
-  columnValueFn?: (row: Row<RowData>) => number | undefined
-): (row: Row<RowData>) => number | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'bigint',
-  columnValueFn?: (row: Row<RowData>) => bigint | undefined
-): (row: Row<RowData>) => bigint | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'boolean',
-  columnValueFn?: (row: Row<RowData>) => boolean | undefined
-): (row: Row<RowData>) => boolean | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'string',
-  columnValueFn?: (row: Row<RowData>) => string | undefined
-): (row: Row<RowData>) => string | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'multi-string',
-  columnValueFn?: (row: Row<RowData>) => Array<string> | undefined
-): (row: Row<RowData>) => Array<string> | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: Column<RowData>['type'],
-  columnValueFn?: Column<RowData>['value']
-): ExtendedColumn<RowData>['value'] {
-  switch (columnType) {
-    case 'string':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as string | undefined;
-    case 'multi-string':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as Array<string> | undefined;
-    case 'number':
-    case 'relative-time':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as number | undefined;
-    case 'bigint':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as bigint | undefined;
-    case 'date':
-    case 'time':
-    case 'date-time':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as Date | undefined;
-    case 'boolean':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as boolean | undefined;
-  }
-}
-
-export function untypedValueFn<RowData extends Record<string, any> = {}>(
+export function builtInValueFn<RowData extends Record<string, any> = {}>(
   column: Column<RowData>
 ): ExtendedColumn<RowData>['value'] {
   return typeof column.value === 'function' ? column.value : (row: Row<RowData>) => row?.data?.[column.field];
 }
-
-/*export const valueFn = <ColumnType extends Column<RowData>, RowData extends Record<string, any> = {}>(column: Column<RowData>):
-  ColumnType extends ('date' | 'time' | 'date-time') ? ((row: Row<RowData>) => Date | undefined) : (
-    ColumnType extends ('number' | 'relative-time') ? ((row: Row<RowData>) => number | undefined) : (
-      ColumnType extends ('bigint') ? ((row: Row<RowData>) => bigint | undefined) : (
-        ColumnType extends ('boolean') ? ((row: Row<RowData>) => boolean | undefined) : (
-          ColumnType extends ('multi-string') ? ((row: Row<RowData>) => Array<string> | undefined) : (
-            (row: Row<RowData>) => string | undefined
-          )
-        )
-      )
-    )
-  ) => (row: Row<RowData>) => (typeof column.value === 'function'
-  ? column.value(row)
-  : rowA.data?.[column.field as keyof RowData]);*/
 //#endregion Column['value']
 
 //#region Date/Time
@@ -189,39 +121,39 @@ export function generateString<RowData extends Record<string, any> = {}>(
     case 'string':
       // eslint-disable-next-line
       // @ts-ignore
-      return generateForString(untypedValueFn(column)(row));
+      return generateForString(builtInValueFn(column)(row));
     case 'multi-string':
       // eslint-disable-next-line
       // @ts-ignore
-      return generateForMultiString(untypedValueFn(column)(row));
+      return generateForMultiString(builtInValueFn(column)(row));
     case 'number':
       // eslint-disable-next-line
       // @ts-ignore
-      return generateForNumber(untypedValueFn(column)(row), options.locale, options.numberFormatOptions);
+      return generateForNumber(builtInValueFn(column)(row), options.locale, options.numberFormatOptions);
     case 'relative-time':
       // eslint-disable-next-line
       // @ts-ignore
-      return generateForRelativeTime(untypedValueFn(column)(row), options.unit, options.relativeTimeFormatter);
+      return generateForRelativeTime(builtInValueFn(column)(row), options.unit, options.relativeTimeFormatter);
     case 'bigint':
       // eslint-disable-next-line
       // @ts-ignore
-      return generateForBigint(untypedValueFn(column)(row), options.locale, options.bigintFormatOptions);
+      return generateForBigint(builtInValueFn(column)(row), options.locale, options.bigintFormatOptions);
     case 'date':
       // eslint-disable-next-line
       // @ts-ignore
-      return generateForDate(untypedValueFn(column)(row), options.locale, options.dateFormatOptions);
+      return generateForDate(builtInValueFn(column)(row), options.locale, options.dateFormatOptions);
     case 'time':
       // eslint-disable-next-line
       // @ts-ignore
-      return generateForTime(untypedValueFn(column)(row), options.locale, options.timeFormatOptions);
+      return generateForTime(builtInValueFn(column)(row), options.locale, options.timeFormatOptions);
     case 'date-time':
       // eslint-disable-next-line
       // @ts-ignore
-      return generateForDateTime(untypedValueFn(column)(row), options.locale, options.dateTimeFormatOptions);
+      return generateForDateTime(builtInValueFn(column)(row), options.locale, options.dateTimeFormatOptions);
     case 'boolean':
       // eslint-disable-next-line
       // @ts-ignore
-      return generateForBoolean(untypedValueFn(column)(row), options.booleanFormatOptions);
+      return generateForBoolean(builtInValueFn(column)(row), options.booleanFormatOptions);
   }
 }
 //#endregion Stringify

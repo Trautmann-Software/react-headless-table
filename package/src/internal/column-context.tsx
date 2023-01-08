@@ -9,8 +9,7 @@ import {
   getNextSortingDirection,
   noop,
   timeToNumber,
-  untypedValueFn,
-  valueFn,
+  builtInValueFn,
 } from '../utils';
 import { useOptions } from '../hooks/use-options';
 
@@ -110,51 +109,58 @@ export function ColumnContextProvider<
       column: Column<RowData, CustomColumn>
     ) => (a: Row<RowData>, b: Row<RowData>, sortingDirection: SortingDirection) => number
   >(
-    (column) => (a, b, sortingDirection) => {
-      if (!defined(sortingDirection)) {
-        return 0;
-      }
-      const directionMultiplicative = sortingDirection === 'asc' ? 1 : -1;
-      switch (column.type) {
-        case 'string':
-        case 'multi-string':
-        case 'boolean':
-          return (
-            directionMultiplicative *
-            compareStrings(
-              generateString(a, column, generateStringOptions(column)),
-              generateString(b, column, generateStringOptions(column))
-            )
-          );
-        case 'number':
-        case 'relative-time':
-          return (
-            directionMultiplicative *
-            ((valueFn(column.type, column.value)(a) ?? 0) - (valueFn(column.type, column.value)(b) ?? 0))
-          );
-        case 'bigint':
-          const difference =
-            (valueFn(column.type, column.value)(a) ?? 0n) - (valueFn(column.type, column.value)(b) ?? 0n);
-          return difference === 0n ? 0 : directionMultiplicative * (difference > 0n ? 1 : -1);
-        case 'date':
-          return (
-            directionMultiplicative *
-            (dateToNumber(valueFn(column.type, column.value)(a)) - dateToNumber(valueFn(column.type, column.value)(b)))
-          );
-        case 'time':
-          return (
-            directionMultiplicative *
-            (timeToNumber(valueFn(column.type, column.value)(a)) - timeToNumber(valueFn(column.type, column.value)(b)))
-          );
-        case 'date-time':
-          return (
-            directionMultiplicative *
-            (datetimeToNumber(valueFn(column.type, column.value)(a)) -
-              datetimeToNumber(valueFn(column.type, column.value)(b)))
-          );
-        default:
+    (column) => {
+      return (a, b, sortingDirection) => {
+        if (!defined(sortingDirection)) {
           return 0;
-      }
+        }
+        const directionMultiplicative = sortingDirection === 'asc' ? 1 : -1;
+        switch (column.type) {
+          case 'string':
+          case 'multi-string':
+          case 'boolean':
+            return (
+              directionMultiplicative *
+              compareStrings(
+                generateString(a, column, generateStringOptions(column)),
+                generateString(b, column, generateStringOptions(column))
+              )
+            );
+          case 'number':
+          case 'relative-time':
+            // eslint-disable-next-line
+            // @ts-ignore
+            return directionMultiplicative * ((builtInValueFn(column)(a) ?? 0) - (builtInValueFn(column)(b) ?? 0));
+          case 'bigint':
+            // eslint-disable-next-line
+            // @ts-ignore
+            const difference = (builtInValueFn(column)(a) ?? 0n) - (builtInValueFn(column)(b) ?? 0n);
+            return difference === 0n ? 0 : directionMultiplicative * (difference > 0n ? 1 : -1);
+          case 'date':
+            return (
+              directionMultiplicative *
+              // eslint-disable-next-line
+              // @ts-ignore
+              (dateToNumber(builtInValueFn(column)(a)) - dateToNumber(builtInValueFn(column)(b)))
+            );
+          case 'time':
+            return (
+              directionMultiplicative *
+              // eslint-disable-next-line
+              // @ts-ignore
+              (timeToNumber(builtInValueFn(column)(a)) - timeToNumber(builtInValueFn(column)(b)))
+            );
+          case 'date-time':
+            return (
+              directionMultiplicative *
+              // eslint-disable-next-line
+              // @ts-ignore
+              (datetimeToNumber(builtInValueFn(column)(a)) - datetimeToNumber(builtInValueFn(column)(b)))
+            );
+          default:
+            return 0;
+        }
+      };
     },
     [compareStrings, generateStringOptions]
   );
@@ -165,12 +171,12 @@ export function ColumnContextProvider<
       ({
         ...(column as ExtendedColumn<RowData, {}>),
         id: column.id ?? String(column.field),
-        value: untypedValueFn(column),
+        value: builtInValueFn(column),
         hidden: column.hidden ?? false,
         searchable: column.searchable ?? true,
-        searchFn: column.searchFn ?? builtInSearchFn({ ...column, value: untypedValueFn(column) }),
+        searchFn: column.searchFn ?? builtInSearchFn({ ...column, value: builtInValueFn(column) }),
         sortingDirection: column.sortingDirection ?? undefined,
-        sortFn: column.sortFn ?? builtInSortFn({ ...column, value: untypedValueFn(column) }),
+        sortFn: column.sortFn ?? builtInSortFn({ ...column, value: builtInValueFn(column) }),
         order: column.order ?? order,
       } as ExtendedColumn<RowData, CustomColumn>),
     [builtInSearchFn, builtInSortFn]
