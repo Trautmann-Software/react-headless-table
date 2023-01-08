@@ -161,7 +161,6 @@ export function ColumnContextProvider<
         hidden: column.hidden ?? false,
         searchable: column.searchable ?? true,
         searchFn: column.searchFn ?? builtInSearchFn(column),
-        filterable: column.filterable ?? true,
         sortFn: column.sortFn ?? builtInSortFn(column),
         order: column.order ?? order,
       } as ExtendedColumn<RowData, CustomColumn>),

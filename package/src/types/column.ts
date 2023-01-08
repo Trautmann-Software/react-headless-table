@@ -133,11 +133,6 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
      */
     searchFn?: (term: string, row: Row<RowData>) => boolean;
     /**
-     * Flag to activate or disable filtering feature of column
-     * @default true
-     */
-    filterable?: boolean;
-    /**
      * Overrides the sort algorithm for this column.
      */
     sortFn?: (a: Row<RowData>, b: Row<RowData>) => number;
