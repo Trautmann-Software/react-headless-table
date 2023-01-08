@@ -50,11 +50,11 @@ export function Table(props) {
 import { useColumns } from '@trautmann/react-headless-table';
 
 export function TableHead() {
-  const { allColumns } = useColumns();
+  const { columns } = useColumns();
   return (
     <thead>
       <tr>
-        {allColumns.map(column => (
+        {columns.map(column => (
           <td key={column.id}>{column.field}</td>
         ))}
       </tr>
@@ -67,13 +67,13 @@ export function TableHead() {
 import { useColumns, useRows } from '@trautmann/react-headless-table';
 
 export function TableHead() {
-  const { allColumns } = useColumns();
-  const { allRows } = useRows();
+  const { columns } = useColumns();
+  const { rows } = useRows();
   return (
     <tbody>
-      {allRows.map(row => (
+      {rows.map(row => (
         <tr key={row.id}>
-          {allColumns.map(column => (
+          {columns.map(column => (
             <td key={column.id}>{row.data?.[column.field] ?? ''}</td>
           ))}
         </tr>
