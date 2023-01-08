@@ -1,10 +1,20 @@
-import { createContext, PropsWithChildren, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
-import { Column, ExtendedColumn, Row } from '../types';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from 'react';
+import { Column, ExtendedColumn, Row, UseColumns } from '../types';
 import {
   datetimeToNumber,
   dateToNumber,
   generateString,
   GenerateStringOptions,
+  noop,
   timeToNumber,
   untypedValueFn,
   valueFn,
@@ -18,12 +28,16 @@ import { useOptions } from '../hooks/use-options';
 export type ColumnContextProps<
   RowData extends Record<string, any> = {},
   CustomColumn extends Record<string, any> = {}
-> = {
-  columns: Array<ExtendedColumn<RowData, CustomColumn>>;
-};
+> = UseColumns<RowData, CustomColumn>;
 
 export const ColumnContext = createContext<ColumnContextProps>({
   columns: [],
+  hideColumn: noop,
+  showColumn: noop,
+  toggleColumnVisibility: noop,
+  isColumnVisibilityChangePending: false,
+  swapColumnOrder: noop,
+  isSwapColumnOrderPending: false,
 });
 
 type Props<
@@ -42,8 +56,11 @@ export function ColumnContextProvider<
   CustomColumn extends Record<string, any> = {}
 >(props: Props<RowData, CustomColumn>) {
   const { children, columns: passedColumns } = props;
+  const deferredPassedColumns = useDeferredValue(passedColumns);
+
   const [columns, setColumns] = useState<Array<ExtendedColumn<RowData, CustomColumn>>>([]);
 
+  //#region Extend columns
   const { internationalizationOptions } = useOptions<{}, CustomColumn, RowData>();
   const generateStringOptions = useCallback<(column: Column<RowData, CustomColumn>) => GenerateStringOptions>(
     (column) => ({
@@ -116,18 +133,16 @@ export function ColumnContextProvider<
           return difference === 0n ? 0 : difference > 0n ? 1 : -1;
         case 'date':
           return (
-            dateToNumber(valueFn(column.type, column.value)(a) ?? new Date('0000-01-01')) -
-            dateToNumber(valueFn(column.type, column.value)(b) ?? new Date('0000-01-01'))
+            dateToNumber(valueFn(column.type, column.value)(a)) - dateToNumber(valueFn(column.type, column.value)(b))
           );
         case 'time':
           return (
-            timeToNumber(valueFn(column.type, column.value)(a) ?? new Date('0000-01-01')) -
-            timeToNumber(valueFn(column.type, column.value)(b) ?? new Date('0000-01-01'))
+            timeToNumber(valueFn(column.type, column.value)(a)) - timeToNumber(valueFn(column.type, column.value)(b))
           );
         case 'date-time':
           return (
-            datetimeToNumber(valueFn(column.type, column.value)(a) ?? new Date('0000-01-01')) -
-            datetimeToNumber(valueFn(column.type, column.value)(b) ?? new Date('0000-01-01'))
+            datetimeToNumber(valueFn(column.type, column.value)(a)) -
+            datetimeToNumber(valueFn(column.type, column.value)(b))
           );
         default:
           return 0;
@@ -135,36 +150,130 @@ export function ColumnContextProvider<
     },
     [compareStrings, generateStringOptions]
   );
-
-  const deferredColumns = useDeferredValue(passedColumns);
-  const extendedColumns = useMemo<Array<ExtendedColumn<RowData, CustomColumn>>>(
-    () =>
-      deferredColumns.map((column, index) => ({
-        ...(column as Column<RowData, CustomColumn>),
-        id: column.id ?? column.field,
+  const extendColumn = useCallback<
+    (column: Column<RowData, CustomColumn>, order: number) => ExtendedColumn<RowData, CustomColumn>
+  >(
+    (column, order) =>
+      ({
+        ...(column as ExtendedColumn<RowData, {}>),
+        id: column.id ?? String(column.field),
         value: untypedValueFn(column),
         hidden: column.hidden ?? false,
         searchable: column.searchable ?? true,
         searchFn: column.searchFn ?? builtInSearchFn(column),
         filterable: column.filterable ?? true,
         sortFn: column.sortFn ?? builtInSortFn(column),
-        order: column.order ?? index,
-      })) as Array<ExtendedColumn<RowData, CustomColumn>>,
-    [builtInSearchFn, builtInSortFn, deferredColumns]
+        order: column.order ?? order,
+      } as ExtendedColumn<RowData, CustomColumn>),
+    [builtInSearchFn, builtInSortFn]
   );
-  const deferredExtendedColumns = useDeferredValue(extendedColumns);
-  useEffect(() => setColumns(deferredExtendedColumns), [deferredExtendedColumns]);
+
+  useEffect(
+    () =>
+      setColumns(
+        deferredPassedColumns.map((column, index) => extendColumn(column, index)).sort((a, b) => a.order - b.order)
+      ),
+    [deferredPassedColumns, extendColumn]
+  );
+  //#endregion Extend columns
+
+  //#region Column re-ordering
+  const [isSwapColumnOrderPending, startSwapColumnOrderTransition] = useTransition();
+  const swapColumnOrder = useCallback<UseColumns<RowData, CustomColumn>['swapColumnOrder']>((columnId1, columnId2) => {
+    startSwapColumnOrderTransition(() => {
+      setColumns((previousColumns) => {
+        const order1 = previousColumns.find((column) => column.id === columnId1)?.order as number;
+        const order2 = previousColumns.find((column) => column.id === columnId2)?.order as number;
+        return previousColumns
+          .map<ExtendedColumn<RowData, CustomColumn>>((column) => {
+            if (column.id === columnId1) {
+              return { ...column, order: order2 };
+            } else if (column.id === columnId2) {
+              return { ...column, order: order1 };
+            } else return column;
+          })
+          .sort((a, b) => a.order - b.order);
+      });
+    });
+  }, []);
+  //#endregion Column re-ordering
+
+  //#region Column visibility
+  const [isColumnVisibilityChangePending, startColumnVisibilityChangeTransition] = useTransition();
+  const hideColumn = useCallback<UseColumns<RowData, CustomColumn>['hideColumn']>((columnId) => {
+    startColumnVisibilityChangeTransition(() => {
+      setColumns((previousColumns) =>
+        previousColumns.map((column) =>
+          column.id === columnId
+            ? {
+                ...column,
+                hidden: true,
+              }
+            : column
+        )
+      );
+    });
+  }, []);
+  const showColumn = useCallback<UseColumns<RowData, CustomColumn>['showColumn']>((columnId) => {
+    startColumnVisibilityChangeTransition(() => {
+      setColumns((currentColumns) =>
+        currentColumns.map((column) =>
+          column.id === columnId
+            ? {
+                ...column,
+                hidden: false,
+              }
+            : column
+        )
+      );
+    });
+  }, []);
+  const toggleColumnVisibility = useCallback<UseColumns<RowData, CustomColumn>['toggleColumnVisibility']>(
+    (columnId) => {
+      startColumnVisibilityChangeTransition(() => {
+        setColumns((currentColumns) =>
+          currentColumns.map((column) =>
+            column.id === columnId
+              ? {
+                  ...column,
+                  hidden: !column.hidden,
+                }
+              : column
+          )
+        );
+      });
+    },
+    []
+  );
+  //#endregion Column visibility
 
   return useMemo(
     () => (
       <ColumnContext.Provider
-        // eslint-disable-next-line
-        // @ts-ignore
-        value={{ columns }}
+        value={{
+          // eslint-disable-next-line
+          // @ts-ignore
+          columns,
+          hideColumn,
+          showColumn,
+          toggleColumnVisibility,
+          isSwapColumnOrderPending,
+          swapColumnOrder,
+          isColumnVisibilityChangePending,
+        }}
       >
         {children}
       </ColumnContext.Provider>
     ),
-    [children, columns]
+    [
+      children,
+      columns,
+      hideColumn,
+      isColumnVisibilityChangePending,
+      isSwapColumnOrderPending,
+      showColumn,
+      swapColumnOrder,
+      toggleColumnVisibility,
+    ]
   );
 }

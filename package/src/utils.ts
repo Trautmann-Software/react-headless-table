@@ -64,6 +64,7 @@ export function valueFn<RowData extends Record<string, any> = {}>(
       return (row: Row<RowData>) => (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as undefined;
   }
 }
+
 export function untypedValueFn<RowData extends Record<string, any> = {}>(
   column: Column<RowData>
 ): ExtendedColumn<RowData>['value'] {
@@ -89,20 +90,25 @@ export function untypedValueFn<RowData extends Record<string, any> = {}>(
 //#endregion Column['value']
 
 //#region Date/Time
-export const dateToNumber = (date: Date) =>
-  date.getFullYear() * 100_00 +
-  (date.getFullYear() < 0 ? -1 : 1) * (date.getMonth() + 1) * 100 +
-  (date.getFullYear() < 0 ? -1 : 1) * date.getDate();
+export const dateToNumber = (date: Date | undefined) =>
+  defined(date)
+    ? date.getFullYear() * 100_00 +
+      (date.getFullYear() < 0 ? -1 : 1) * (date.getMonth() + 1) * 100 +
+      (date.getFullYear() < 0 ? -1 : 1) * date.getDate()
+    : 0;
 
-export const timeToNumber = (time: Date) => time.getHours() * 100_00 + time.getMinutes() * 100 + time.getSeconds();
+export const timeToNumber = (time: Date | undefined) =>
+  defined(time) ? time.getHours() * 100_00 + time.getMinutes() * 100 + time.getSeconds() : 0;
 
-export const datetimeToNumber = (datetime: Date) =>
-  datetime.getFullYear() * 100_00_00_00_00 +
-  (datetime.getFullYear() < 0 ? -1 : 1) * (datetime.getMonth() + 1) * 100_00_00_00 +
-  (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getDate() * 100_00_00 +
-  (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getHours() * 100_00 +
-  (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getMinutes() * 100 +
-  (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getSeconds();
+export const datetimeToNumber = (datetime: Date | undefined) =>
+  defined(datetime)
+    ? datetime.getFullYear() * 100_00_00_00_00 +
+      (datetime.getFullYear() < 0 ? -1 : 1) * (datetime.getMonth() + 1) * 100_00_00_00 +
+      (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getDate() * 100_00_00 +
+      (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getHours() * 100_00 +
+      (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getMinutes() * 100 +
+      (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getSeconds()
+    : 0;
 //#endregion Date/Time
 
 //#region Stringify
@@ -204,4 +210,5 @@ export function generateString<RowData extends Record<string, any> = {}>(
       return '';
   }
 }
+
 //#endregion Stringify

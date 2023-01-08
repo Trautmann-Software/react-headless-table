@@ -100,7 +100,7 @@ export const rows: Array<RowData> = [
 
 function TestComponent() {
   const { searchQuery, setSearchQuery } = useSearchQuery();
-  const { orderedVisibleColumns } = useColumns<RowData>();
+  const { columns } = useColumns<RowData>();
   const { sortedRows } = useRows<RowData>();
   return (
     <>
@@ -113,7 +113,7 @@ function TestComponent() {
       <table>
         <thead>
           <tr>
-            {orderedVisibleColumns.map(({ field }) => (
+            {columns.map(({ field }) => (
               <td key={field} role="table-header" data-testid={`table-header-${field}`}>
                 {field}
               </td>
@@ -123,7 +123,7 @@ function TestComponent() {
         <tbody>
           {sortedRows.map((row) => (
             <tr key={row.id} role="table-row" data-testid={`table-row-${row.data.stringField}`}>
-              {orderedVisibleColumns.map(({ field, value }) => (
+              {columns.map(({ field, value }) => (
                 <td
                   key={field}
                   role={`table-row-${row.data.stringField}-cell`}

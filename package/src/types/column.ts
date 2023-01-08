@@ -164,16 +164,32 @@ export type ExtendedColumn<RowData extends Record<string, any> = {}, CustomColum
  * @template CustomColumn is the additional type definitions for the column.
  */
 export type UseColumns<RowData extends Record<string, any> = {}, CustomColumn extends Record<string, any> = {}> = {
-  allColumns: Array<ExtendedColumn<RowData, CustomColumn>>;
-  visibleColumns: Array<ExtendedColumn<RowData, CustomColumn>>;
-  orderedVisibleColumns: Array<ExtendedColumn<RowData, CustomColumn>>;
-  hideColumn: (id: ExtendedColumn<RowData, CustomColumn>['field']) => void;
-  showColumn: (id: ExtendedColumn<RowData, CustomColumn>['field']) => void;
-  toggleColumnVisibility: (id: ExtendedColumn<RowData, CustomColumn>['field']) => void;
+  /**
+   * Extended stateful columns.
+   */
+  columns: Array<ExtendedColumn<RowData, CustomColumn>>;
+  /**
+   * Sets `hidden` attribute to `true` for the given column ID.
+   */
+  hideColumn: (columnId: string) => void;
+  /**
+   * Sets `hidden` attribute to `false` for the given column ID.
+   */
+  showColumn: (columnId: string) => void;
+  /**
+   * Reverts `hidden` attribute for the given column ID.
+   */
+  toggleColumnVisibility: (columnId: string) => void;
+  /**
+   * Column visibility change is done as a transaction. This attribute mirrors the transaction state.
+   */
   isColumnVisibilityChangePending: boolean;
-  swapColumnOrder: (
-    id1: ExtendedColumn<RowData, CustomColumn>['field'],
-    id2: ExtendedColumn<RowData, CustomColumn>['field']
-  ) => void;
+  /**
+   * Swaps `order` attributes for the given column IDs.
+   */
+  swapColumnOrder: (columnId1: string, columnId2: string) => void;
+  /**
+   * Column order change is done as a transaction. This attribute mirrors the transaction state.
+   */
   isSwapColumnOrderPending: boolean;
 };
