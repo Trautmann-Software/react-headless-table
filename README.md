@@ -25,10 +25,62 @@ npm i uuid @trautmann/react-headless-table
 ```
 
 Use it in your code:
-
-```ts
+1. Wrap you table component into `ReactHeadlessTable` and provide it with necessary data
+```js
+// table.js
 import { ReactHeadlessTable } from '@trautmann/react-headless-table';
-// Coming soon
+import { TableHead } from './table-head';
+import { TableBody } from './table-body';
+
+export function Table(props) {
+  const { columns, rows } = props;
+  return (
+    <ReactHeadlessTable columns={columns} rows={rows}>
+      <table>
+        <TableHead/>
+        <TableBody/>
+      </table>
+    </ReactHeadlessTable>
+  );
+}
+```
+2. Access data and functionality via hooks in child components
+```js
+// table-head.js
+import { useColumns } from '@trautmann/react-headless-table';
+
+export function TableHead() {
+  const { columns } = useColumns();
+  return (
+    <thead>
+      <tr>
+        {columns.map(column => (
+          <td key={column.id}>{column.field}</td>
+        ))}
+      </tr>
+    </thead>
+  );
+}
+```
+```js
+// table-body.js
+import { useColumns, useRows } from '@trautmann/react-headless-table';
+
+export function TableHead() {
+  const { columns } = useColumns();
+  const { rows } = useRows();
+  return (
+    <tbody>
+      {rows.map(row => (
+        <tr key={row.id}>
+          {columns.map(column => (
+            <td key={column.id}>{row.data?.[column.field] ?? ''}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  );
+}
 ```
 
 Have a look at the available [component properties](https://react-headless-table.trautmann.software/docs/component-properties) and make sure to browse the comprehensive list of [usage examples](https://react-headless-table.trautmann.software/examples/basic-usage).
@@ -45,7 +97,7 @@ If you find this package useful, please consider ❤️[sponsoring my work](http
 
 ## Other means of support
 
-If you find this package useful, please 🙏star the repository, 💕[tweet about it](http://twitter.com/share?text=Build%20data-rich%20React%20applications%20with%20%40trautmann%2Freact-headless-table&url=https%3A%2F%2Freact-headless-table.trautmann.software&hashtags=react%2Cdatatable%2Cheadless%2Creact&via=trautmann_soft), 👍[endorse me on LinkedIn](https://www.linkedin.com/in/rashad2985) or consider hiring my services.
+If you find this package useful, please 🙏star the repository, 💕[tweet about it](http://twitter.com/share?text=Build%20data-rich%20React%20applications%20with%20%40trautmann%2Freact-headless-table&url=https%3A%2F%2Freact-headless-table.trautmann.software&hashtags=react%2Cdatatable%2Cheadless%2Chooks&via=trautmann_soft), 👍[endorse me on LinkedIn](https://www.linkedin.com/in/rashad2985) or consider hiring my services.
 
 The more stars this repository gets, the more visibility it gains among the developers and users community. The more
 users it gets, the more chances that some of those users will become active code contributors willing to put
