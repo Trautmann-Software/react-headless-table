@@ -38,6 +38,7 @@ test('utils getNextSortingDirection', async () => {
 
 //#region Date & Time
 test('utils dateToNumber', async () => {
+  expect(dateToNumber(undefined)).toBe(0);
   // A.D.
   expect(dateToNumber(new Date('2022-01-01T11:22:33'))).toBe(2022_01_01);
   expect(dateToNumber(new Date('2022-12-31T11:22:33'))).toBe(2022_12_31);
@@ -53,6 +54,7 @@ test('utils dateToNumber', async () => {
 });
 
 test('utils timeToNumber', async () => {
+  expect(timeToNumber(undefined)).toBe(0);
   // A.D.
   expect(timeToNumber(new Date('2022-01-01T11:22:33'))).toBe(11_22_33);
   expect(timeToNumber(new Date('2022-12-31T11:22:33.444'))).toBe(11_22_33);
@@ -67,6 +69,7 @@ test('utils timeToNumber', async () => {
   expect(timeToNumber(new Date('-012000-12-31T11:22:33.444'))).toBe(11_22_33);
 });
 test('utils datetimeToNumber', async () => {
+  expect(datetimeToNumber(undefined)).toBe(0);
   // A.D.
   expect(datetimeToNumber(new Date('2022-01-01T11:22:33'))).toBe(2022_01_01_11_22_33);
   expect(datetimeToNumber(new Date('2022-12-31T11:22:33.444'))).toBe(2022_12_31_11_22_33);
@@ -80,7 +83,7 @@ test('utils datetimeToNumber', async () => {
   expect(datetimeToNumber(new Date('-012000-01-01T11:22:33.444'))).toBe(-12000_01_01_11_22_33);
   expect(datetimeToNumber(new Date('-012000-12-31T11:22:33.444'))).toBe(-12000_12_31_11_22_33);
 });
-//#region Date & Time
+//#endregion Date & Time
 
 //#region Stringify
 test('utils generateString', async () => {
