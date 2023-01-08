@@ -6,10 +6,9 @@ import { Row } from './row';
  * @template CustomFilter is the additional type definitions for the filter.
  * @template RowData is the generic row type.
  */
-export type Filter<CustomFilter extends Record<string, any> = {}, RowData extends Record<string, any> = {}> =
-  {
-    [Key in keyof CustomFilter]: Key extends undefined ? never : CustomFilter[Key];
-  } & {
+export type Filter<CustomFilter extends Record<string, any> = {}, RowData extends Record<string, any> = {}> = {
+  [Key in keyof CustomFilter]: Key extends undefined ? never : CustomFilter[Key];
+} & {
   /**
    * ID of the filter. If not provided, a UUID will be generated.
    */

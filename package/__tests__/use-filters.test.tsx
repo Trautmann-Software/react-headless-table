@@ -19,24 +19,34 @@ function TestComponent() {
         ))}
       </ul>
 
-      <button role="add-filter" onClick={() => addFilter({
-        id: 'added',
-        chainAs: 'OR',
-        columnId: 'column-add',
-        operator: () => true,
-        customFilterField: 'custom-field',
-        customOptionalFilterField: 'optional-field'
-      })}>
+      <button
+        role="add-filter"
+        onClick={() =>
+          addFilter({
+            id: 'added',
+            chainAs: 'OR',
+            columnId: 'column-add',
+            operator: () => true,
+            customFilterField: 'custom-field',
+            customOptionalFilterField: 'optional-field',
+          })
+        }
+      >
         add-filter
       </button>
-      <button role="update-filter" onClick={() => updateFilter({
-        id: 'added',
-        chainAs: 'AND',
-        columnId: 'column-add',
-        operator: () => true,
-        customFilterField: 'updated-custom-field',
-        customOptionalFilterField: 'updated-optional-field'
-      })}>
+      <button
+        role="update-filter"
+        onClick={() =>
+          updateFilter({
+            id: 'added',
+            chainAs: 'AND',
+            columnId: 'column-add',
+            operator: () => true,
+            customFilterField: 'updated-custom-field',
+            customOptionalFilterField: 'updated-optional-field',
+          })
+        }
+      >
         update-filter
       </button>
       <button role="remove-filter" onClick={() => removeFilter('added')}>
@@ -48,11 +58,13 @@ function TestComponent() {
 
 test('useColumns hook delivers correct columns', async () => {
   render(
-    <TestComponentProvider<{}, {}, {}, CustomFilter> filters={[
-      { operator: () => true, customFilterField: 'custom-field' },
-      { operator: () => true, customFilterField: 'custom-field', customOptionalFilterField: 'optional-field' },
-      { operator: () => true, customFilterField: 'custom-field' }
-    ]}>
+    <TestComponentProvider<{}, {}, {}, CustomFilter>
+      filters={[
+        { operator: () => true, customFilterField: 'custom-field' },
+        { operator: () => true, customFilterField: 'custom-field', customOptionalFilterField: 'optional-field' },
+        { operator: () => true, customFilterField: 'custom-field' },
+      ]}
+    >
       <TestComponent />
     </TestComponentProvider>
   );

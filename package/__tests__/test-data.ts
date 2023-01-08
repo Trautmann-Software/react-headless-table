@@ -19,4 +19,4 @@ export type CustomOptions<GenericColumn extends Record<string, any> = {}, RowDat
 export type CustomFilter = {
   customFilterField: string;
   customOptionalFilterField?: string;
-}
+};

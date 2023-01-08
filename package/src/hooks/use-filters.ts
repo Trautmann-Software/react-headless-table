@@ -15,11 +15,14 @@ export function useFilters<
   const addFilter = useCallback<UseFilters<CustomFilter, RowData>['addFilter']>(
     (filter) => {
       startFiltersUpdateTransition(() => {
-        setFilters(currentFilters => [...currentFilters, {
-          ...filter,
-          id: filter.id ?? uuid(),
-          chainAs: filter.chainAs ?? 'AND'
-        }]);
+        setFilters((currentFilters) => [
+          ...currentFilters,
+          {
+            ...filter,
+            id: filter.id ?? uuid(),
+            chainAs: filter.chainAs ?? 'AND',
+          },
+        ]);
       });
     },
     [setFilters]
@@ -27,12 +30,17 @@ export function useFilters<
   const updateFilter = useCallback<UseFilters<CustomFilter, RowData>['updateFilter']>(
     (filter) => {
       startFiltersUpdateTransition(() => {
-        setFilters(currentFilters => currentFilters.map(existingFilter =>
-          existingFilter.id === filter.id ? {
-            ...filter,
-            id: filter.id ?? uuid(),
-            chainAs: filter.chainAs ?? 'AND'
-          } : existingFilter));
+        setFilters((currentFilters) =>
+          currentFilters.map((existingFilter) =>
+            existingFilter.id === filter.id
+              ? {
+                  ...filter,
+                  id: filter.id ?? uuid(),
+                  chainAs: filter.chainAs ?? 'AND',
+                }
+              : existingFilter
+          )
+        );
       });
     },
     [setFilters]
@@ -40,7 +48,7 @@ export function useFilters<
   const removeFilter = useCallback<UseFilters<CustomFilter, RowData>['removeFilter']>(
     (filterId) => {
       startFiltersUpdateTransition(() => {
-        setFilters(currentFilters => currentFilters.filter(({ id }) => id !== filterId));
+        setFilters((currentFilters) => currentFilters.filter(({ id }) => id !== filterId));
       });
     },
     [setFilters]
