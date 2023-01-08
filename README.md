@@ -25,7 +25,9 @@ npm i uuid @trautmann/react-headless-table
 ```
 
 Use it in your code:
+
 1. Wrap you table component into `ReactHeadlessTable` and provide it with necessary data
+
 ```js
 // table.js
 import { ReactHeadlessTable } from '@trautmann/react-headless-table';
@@ -37,14 +39,16 @@ export function Table(props) {
   return (
     <ReactHeadlessTable columns={columns} rows={rows}>
       <table>
-        <TableHead/>
-        <TableBody/>
+        <TableHead />
+        <TableBody />
       </table>
     </ReactHeadlessTable>
   );
 }
 ```
+
 2. Access data and functionality via hooks in child components
+
 ```js
 // table-head.js
 import { useColumns } from '@trautmann/react-headless-table';
@@ -54,7 +58,7 @@ export function TableHead() {
   return (
     <thead>
       <tr>
-        {columns.map(column => (
+        {columns.map((column) => (
           <td key={column.id}>{column.field}</td>
         ))}
       </tr>
@@ -62,6 +66,7 @@ export function TableHead() {
   );
 }
 ```
+
 ```js
 // table-body.js
 import { useColumns, useRows } from '@trautmann/react-headless-table';
@@ -71,9 +76,9 @@ export function TableHead() {
   const { rows } = useRows();
   return (
     <tbody>
-      {rows.map(row => (
+      {rows.map((row) => (
         <tr key={row.id}>
-          {columns.map(column => (
+          {columns.map((column) => (
             <td key={column.id}>{row.data?.[column.field] ?? ''}</td>
           ))}
         </tr>

@@ -76,9 +76,7 @@ export function valueFn<RowData extends Record<string, any> = {}>(
 export function untypedValueFn<RowData extends Record<string, any> = {}>(
   column: Column<RowData>
 ): ExtendedColumn<RowData>['value'] {
-  // eslint-disable-next-line
-  // @ts-ignore
-  return typeof column.value === 'function' ? column.value(row) : (row: Row<RowData>) => row?.data?.[column.field];
+  return typeof column.value === 'function' ? column.value : (row: Row<RowData>) => row?.data?.[column.field];
 }
 
 /*export const valueFn = <ColumnType extends Column<RowData>, RowData extends Record<string, any> = {}>(column: Column<RowData>):
@@ -189,31 +187,41 @@ export function generateString<RowData extends Record<string, any> = {}>(
 ) {
   switch (column.type) {
     case 'string':
-      return generateForString(valueFn(column.type, column.value)(row));
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForString(untypedValueFn(column)(row));
     case 'multi-string':
-      return generateForMultiString(valueFn(column.type, column.value)(row));
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForMultiString(untypedValueFn(column)(row));
     case 'number':
-      return generateForNumber(valueFn(column.type, column.value)(row), options.locale, options.numberFormatOptions);
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForNumber(untypedValueFn(column)(row), options.locale, options.numberFormatOptions);
     case 'relative-time':
-      return generateForRelativeTime(
-        valueFn(column.type, column.value)(row),
-        options.unit,
-        options.relativeTimeFormatter
-      );
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForRelativeTime(untypedValueFn(column)(row), options.unit, options.relativeTimeFormatter);
     case 'bigint':
-      return generateForBigint(valueFn(column.type, column.value)(row), options.locale, options.bigintFormatOptions);
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForBigint(untypedValueFn(column)(row), options.locale, options.bigintFormatOptions);
     case 'date':
-      return generateForDate(valueFn(column.type, column.value)(row), options.locale, options.dateFormatOptions);
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForDate(untypedValueFn(column)(row), options.locale, options.dateFormatOptions);
     case 'time':
-      return generateForTime(valueFn(column.type, column.value)(row), options.locale, options.timeFormatOptions);
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForTime(untypedValueFn(column)(row), options.locale, options.timeFormatOptions);
     case 'date-time':
-      return generateForDateTime(
-        valueFn(column.type, column.value)(row),
-        options.locale,
-        options.dateTimeFormatOptions
-      );
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForDateTime(untypedValueFn(column)(row), options.locale, options.dateTimeFormatOptions);
     case 'boolean':
-      return generateForBoolean(valueFn(column.type, column.value)(row), options.booleanFormatOptions);
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForBoolean(untypedValueFn(column)(row), options.booleanFormatOptions);
   }
 }
 //#endregion Stringify
