@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { TestComponentProvider } from './test-component-provider';
 import { CustomFilter } from './test-data';
-import { useFilters } from '../src/hooks/use-filters';
+import { useFilters } from '../src';
 
 function TestComponent() {
   const { filters, addFilter, updateFilter, removeFilter } = useFilters<CustomFilter>();

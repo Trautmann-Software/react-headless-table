@@ -1,9 +1,8 @@
-import { createContext, PropsWithChildren, useCallback, useDeferredValue, useMemo } from 'react';
+import { Context, createContext, PropsWithChildren, useCallback, useContext, useMemo } from 'react';
 import { Row, UseRows } from '../types';
-import { useColumns, useSearchQuery } from '../hooks';
-import { useOptions } from '../hooks/use-options';
-import { useFilters } from '../hooks/use-filters';
+import { useColumns, useFilters, useRowSelection, useSearchQuery } from '../hooks';
 import { defined } from '../utils';
+import { RowsWithIdsContext, RowsWithIdsContextProps } from './rows-with-ids-context';
 
 export type RowsContextProps<RowData extends Record<string, any> = {}> = UseRows<RowData>;
 
@@ -11,24 +10,20 @@ export const RowsContext = createContext<RowsContextProps>({
   rows: [],
 });
 
-type Props<RowData extends Record<string, any> = {}> = PropsWithChildren<{
-  rows: Array<RowData>;
-}>;
-
-export function RowsContextProvider<RowData extends Record<string, any> = {}>(props: Props<RowData>) {
-  const { children, rows: passedRows } = props;
-  const deferredPassedRows = useDeferredValue(passedRows);
-  const {
-    rowOptions: { idFn: generateId },
-  } = useOptions<{}, {}, RowData>();
-  const extendRow = useCallback<(rowData: RowData) => Row<RowData>>(
-    (rowData) => ({
-      id: generateId(rowData),
-      data: rowData,
-    }),
-    [generateId]
+export function RowsContextProvider<RowData extends Record<string, any> = {}>({ children }: PropsWithChildren) {
+  const { rowsWithIds } = useContext<RowsWithIdsContextProps<RowData>>(
+    RowsWithIdsContext as unknown as Context<RowsWithIdsContextProps<RowData>>
   );
-  const extendedRows = useMemo(() => deferredPassedRows.map(extendRow), [deferredPassedRows, extendRow]);
+  const { selectedRowIds } = useRowSelection();
+
+  const extendRow = useCallback<(row: Pick<Row<RowData>, 'id' | 'data'>) => Row<RowData>>(
+    (row) => ({
+      ...row,
+      selected: selectedRowIds.has(row.id),
+    }),
+    [selectedRowIds]
+  );
+  const extendedRows = useMemo(() => rowsWithIds.map(extendRow), [extendRow, rowsWithIds]);
 
   const { columns } = useColumns<RowData>();
   const { filters } = useFilters<{}, RowData>();

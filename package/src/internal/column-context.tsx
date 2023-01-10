@@ -1,6 +1,7 @@
 import { createContext, PropsWithChildren, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { Column, ExtendedColumn, Row, SortingDirection, UseColumns } from '../types';
 import {
+  builtInValueFn,
   datetimeToNumber,
   dateToNumber,
   defined,
@@ -9,9 +10,8 @@ import {
   getNextSortingDirection,
   noop,
   timeToNumber,
-  builtInValueFn,
 } from '../utils';
-import { useOptions } from '../hooks/use-options';
+import { useOptions } from '../hooks';
 
 /**
  * @template RowData is the generic row type.

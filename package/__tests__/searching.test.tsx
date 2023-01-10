@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TestComponentProvider } from './test-component-provider';
-import { useRows } from '../src/hooks/use-rows';
+import { useRows, useSearchQuery } from '../src';
 import { Data, testColumns, testRows } from './test-data';
-import { useColumns, useSearchQuery } from '../src';
 import userEvent from '@testing-library/user-event';
 
 function TestComponent() {

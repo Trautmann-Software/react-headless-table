@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TestComponentProvider } from './test-component-provider';
 import { CustomColumn, CustomOptions, Data } from './test-data';
-import { useOptions } from '../src/hooks/use-options';
+import { useOptions } from '../src';
 
 function TestComponent() {
   const { internationalizationOptions, rowOptions, ...customOptions } = useOptions<Data, CustomColumn, CustomOptions>();

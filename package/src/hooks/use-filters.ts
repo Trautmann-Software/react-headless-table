@@ -1,5 +1,5 @@
 import { Context, useContext, useMemo } from 'react';
-import { UseFilters } from '../types/filter';
+import { UseFilters } from '../types';
 import { FilterContext, FilterContextProps } from '../internal/filter-context';
 
 export function useFilters<

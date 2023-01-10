@@ -7,6 +7,10 @@ export type Row<RowData extends Record<string, any> = {}> = {
    * Passed data for the row.
    */
   data: RowData;
+  /**
+   * Flag whether the row is selected.
+   */
+  selected: boolean;
 };
 
 export type UseRows<RowData extends Record<string, any> = {}> = {

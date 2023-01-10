@@ -1,11 +1,12 @@
 import { PropsWithChildren, useMemo } from 'react';
 import { SearchContextProvider } from './internal/search-context';
-import { Column, Options } from './types';
+import { Column, Filter, Options } from './types';
 import { ColumnContextProvider } from './internal/column-context';
 import { RowsContextProvider } from './internal/rows-context';
 import { OptionsContextProvider } from './internal/options-context';
-import { Filter } from './types/filter';
 import { FilterContextProvider } from './internal/filter-context';
+import { RowsWithIdsContextProvider } from './internal/rows-with-ids-context';
+import { RowSelectionContextProvider } from './internal/row-selection-context';
 
 /**
  * @template RowData is the generic row type.
@@ -45,7 +46,11 @@ export function ReactHeadlessTable<
         <ColumnContextProvider columns={columns}>
           <SearchContextProvider searchQuery={searchQuery}>
             <FilterContextProvider filters={filters}>
-              <RowsContextProvider rows={rows}>{children}</RowsContextProvider>
+              <RowsWithIdsContextProvider rows={rows}>
+                <RowSelectionContextProvider>
+                  <RowsContextProvider>{children}</RowsContextProvider>
+                </RowSelectionContextProvider>
+              </RowsWithIdsContextProvider>
             </FilterContextProvider>
           </SearchContextProvider>
         </ColumnContextProvider>

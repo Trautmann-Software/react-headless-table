@@ -89,21 +89,21 @@ test('utils datetimeToNumber', async () => {
 test('utils generateString', async () => {
   expect(
     generateString<Pick<Data, 'username'>>(
-      { id: 'id', data: { username: 'username-1' } },
+      { id: 'id', data: { username: 'username-1' }, selected: false },
       { field: 'username', type: 'string', value: (row) => row.data.username },
       {}
     )
   ).toBe('username-1');
   expect(
     generateString<Pick<Data, 'age'>>(
-      { id: 'id', data: { age: 45 } },
+      { id: 'id', data: { age: 45 }, selected: false },
       { field: 'age', type: 'number', value: (row) => row.data.age },
       {}
     )
   ).toBe('45');
   expect(
     generateString<Pick<Data, 'vip'>>(
-      { id: 'id', data: { vip: true } },
+      { id: 'id', data: { vip: true }, selected: false },
       { field: 'vip', type: 'boolean', value: (row) => row.data.vip },
       { booleanFormatOptions: { true: 'true', false: 'false', empty: '' } }
     )

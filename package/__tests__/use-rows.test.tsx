@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TestComponentProvider } from './test-component-provider';
-import { useRows } from '../src/hooks/use-rows';
+import { useRows } from '../src';
 import { Data, testRows } from './test-data';
 
 function TestComponent() {

@@ -1,10 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TestComponentProvider } from './test-component-provider';
-import { useRows } from '../src/hooks/use-rows';
-import { CustomFilter, Data, testColumns, testRows } from './test-data';
+import { useFilters, useRows } from '../src';
+import { Data, testColumns, testRows } from './test-data';
 import userEvent from '@testing-library/user-event';
-import { useFilters } from '../src/hooks/use-filters';
 
 function TestComponent() {
   const { rows } = useRows<Data>();

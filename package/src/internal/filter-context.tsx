@@ -8,7 +8,7 @@ import {
   useState,
   useTransition,
 } from 'react';
-import { Filter, UseFilters } from '../types/filter';
+import { Filter, UseFilters } from '../types';
 import { v4 as uuid } from 'uuid';
 import { noop } from '../utils';
 
