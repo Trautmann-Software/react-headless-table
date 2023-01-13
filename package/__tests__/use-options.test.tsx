@@ -5,7 +5,11 @@ import { CustomColumn, CustomOptions, Data } from './test-data';
 import { useOptions } from '../src';
 
 function TestComponent() {
-  const { internationalizationOptions, rowOptions, ...customOptions } = useOptions<Data, CustomColumn, CustomOptions>();
+  const { internationalizationOptions, rowOptions, paginationOptions, ...customOptions } = useOptions<
+    CustomOptions,
+    CustomColumn,
+    Data
+  >();
   return (
     <>
       <ul role="internationalizationOptions">
@@ -62,6 +66,12 @@ function TestComponent() {
       <ul role="rowOptions">
         <li data-testid="rowOptions-detailsPanelType">{rowOptions.detailsPanelType}</li>
       </ul>
+      <li data-testid="paginationOptions">
+        {Object.entries(paginationOptions ?? {})
+          .map(([key, value]) => `${key}:${value}`)
+          .sort()
+          .join(',')}
+      </li>
       <p role="customOptions" data-testid="customOptions">
         {Object.entries(customOptions)
           .map(([key, value]) => `${key}:${value}`)
@@ -92,6 +102,8 @@ test('useOptions hook delivers default options if no options passed', async () =
   );
   // rowOptions
   expect(screen.getByTestId('rowOptions-detailsPanelType')).toHaveTextContent('single');
+  // paginationOptions
+  expect(screen.getByTestId('paginationOptions')).toHaveTextContent('currentPage:1,pageSize:5');
 });
 
 test('useOptions hook delivers default options merged with option overrides', async () => {
@@ -135,6 +147,10 @@ test('useOptions hook delivers default options merged with option overrides', as
         rowOptions: {
           detailsPanelType: 'multiple',
         },
+        paginationOptions: {
+          currentPage: 2,
+          pageSize: 10,
+        },
       }}
     >
       <TestComponent />
@@ -160,6 +176,8 @@ test('useOptions hook delivers default options merged with option overrides', as
   );
   // rowOptions
   expect(screen.getByTestId('rowOptions-detailsPanelType')).toHaveTextContent('multiple');
+  // paginationOptions
+  expect(screen.getByTestId('paginationOptions')).toHaveTextContent('currentPage:2,pageSize:10');
 });
 
 test('useOptions hook delivers default options merged with option overrides', async () => {

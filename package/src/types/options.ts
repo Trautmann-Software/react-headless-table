@@ -71,6 +71,19 @@ export type RowOptions<RowData extends Record<string, any> = {}> = {
   detailsPanelType?: 'single' | 'multiple';
 };
 
+export type PaginationOptions = {
+  /**
+   * Current page number.
+   * @default 1
+   */
+  currentPage?: number;
+  /**
+   * Number of rows per page.
+   * @default 5
+   */
+  pageSize?: number;
+};
+
 /**
  * An extendable options.
  * Options can be extended with additional fields if necessary.
@@ -93,6 +106,10 @@ export type Options<
    * Row related options.
    */
   rowOptions?: RowOptions;
+  /**
+   * Pagination related options.
+   */
+  paginationOptions?: PaginationOptions;
 };
 
 /**
@@ -117,4 +134,8 @@ export type UseOptions<
    * Row related options.
    */
   rowOptions: Required<RowOptions>;
+  /**
+   * Pagination related options.
+   */
+  paginationOptions: Required<PaginationOptions>;
 };

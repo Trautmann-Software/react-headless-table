@@ -7,6 +7,7 @@ import { OptionsContextProvider } from './internal/options-context';
 import { FilterContextProvider } from './internal/filter-context';
 import { RowsWithIdsContextProvider } from './internal/rows-with-ids-context';
 import { RowSelectionContextProvider } from './internal/row-selection-context';
+import { PaginationContextProvider } from './internal/pagination-context';
 
 /**
  * @template RowData is the generic row type.
@@ -48,7 +49,9 @@ export function ReactHeadlessTable<
             <FilterContextProvider filters={filters}>
               <RowsWithIdsContextProvider rows={rows}>
                 <RowSelectionContextProvider>
-                  <RowsContextProvider>{children}</RowsContextProvider>
+                  <RowsContextProvider>
+                    <PaginationContextProvider>{children}</PaginationContextProvider>
+                  </RowsContextProvider>
                 </RowSelectionContextProvider>
               </RowsWithIdsContextProvider>
             </FilterContextProvider>

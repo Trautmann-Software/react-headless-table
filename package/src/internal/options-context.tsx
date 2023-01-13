@@ -34,6 +34,10 @@ const defaultOptions: OptionsContextProps = {
     idFn,
     detailsPanelType: 'single',
   },
+  paginationOptions: {
+    currentPage: 1,
+    pageSize: 5,
+  },
 };
 
 export const OptionsContext = createContext<OptionsContextProps>(defaultOptions);
@@ -73,6 +77,10 @@ export function OptionsContextProvider<
       rowOptions: {
         ...defaultOptions.rowOptions,
         ...(deferredOptions?.rowOptions ?? {}),
+      },
+      paginationOptions: {
+        ...defaultOptions.paginationOptions,
+        ...(deferredOptions?.paginationOptions ?? {}),
       },
     }),
     [deferredOptions]
