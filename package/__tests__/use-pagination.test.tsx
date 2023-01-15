@@ -54,7 +54,7 @@ function TestComponent() {
       <button role="page-size-25" onClick={() => setPageSize(25)} />
       <button role="page-size-12" onClick={() => setPageSize(12)} />
       <button role="page-size-6" onClick={() => setPageSize(6)} />
-      <button role="page-size-5" onClick={() => setPageSize(prevState => prevState - 1)} />
+      <button role="page-size-5" onClick={() => setPageSize((prevState) => prevState - 1)} />
     </>
   );
 }
