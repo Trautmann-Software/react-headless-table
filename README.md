@@ -113,13 +113,13 @@ which in turn will help maintain my vested interest in keeping the project alive
 
 ## License
 
-The [MIT License](https://github.com/Trautmann-Software/react-headless-table/blob/main/LICENSE).
+The [MIT License][license-url].
 
 [npm-url]: https://www.npmjs.com/package/@trautmann/react-headless-table
 [repo-url]: https://github.com/Trautmann-Software/react-headless-table
 [stars-url]: https://github.com/Trautmann-Software/react-headless-table/stargazers
 [closed-issues-url]: https://github.com/Trautmann-Software/react-headless-table/issues?q=is%3Aissue+is%3Aclosed
-[license-url]: LICENSE
+[license-url]: https://github.com/Trautmann-Software/react-headless-table/blob/HEAD/LICENSE
 [npm-image]: https://img.shields.io/npm/v/@trautmann/react-headless-table.svg?style=flat-square
 [license-image]: http://img.shields.io/npm/l/@trautmann/react-headless-table.svg?style=flat-square
 [downloads-image]: http://img.shields.io/npm/dm/@trautmann/react-headless-table.svg?style=flat-square
