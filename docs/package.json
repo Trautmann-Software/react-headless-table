@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev": "next dev",
+    "prebuild": "cp -f ../README.md pages/index.md",
     "build": "next build && next-sitemap && next export",
     "start": "next start",
     "lint": "next lint"
