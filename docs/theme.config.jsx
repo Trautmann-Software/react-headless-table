@@ -1,23 +1,15 @@
 import { useRouter } from 'next/router';
-import { useConfig } from 'nextra-theme-docs';
 import { Timestamp } from './theme-components/timestamp';
+import { FooterText } from './theme-components/footer-text';
+import { Logo } from './theme-components/logo';
+import { Head } from './theme-components/head';
 
 export default {
-  head: () => {
-    const { asPath } = useRouter();
-    const { frontMatter } = useConfig();
-    return (
-      <>
-        <meta property="og:url" content={`https://my-app.com${asPath}`} />
-        <meta property="og:title" content={frontMatter.title || 'Nextra'} />
-        <meta property="og:description" content={frontMatter.description || 'My Nextra Documentation'} />
-      </>
-    );
-  },
-  logo: <span>My Nextra Documentation</span>,
+  head: Head,
+  logo: <Logo />,
   logoLink: '/',
   project: {
-    link: 'https://github.com/shuding/nextra',
+    link: 'https://github.com/Trautmann-Software/react-headless-table'
     // If icon is missing, it will be a GitHub icon(opens in a new tab) by default.
     /*icon: ( // Gitlab Icon
       <svg width="24" height="24" viewBox="0 0 256 256">
@@ -27,7 +19,7 @@ export default {
     )*/
   },
   chat: {
-    link: 'https://twitter.com/shuding_'
+    link: 'https://discord.gg/5sjTep9yvC'
     // If icon is missing, it will be a Discord icon by default.
     /*icon: <svg width="24" height="24" viewBox="0 0 256 256">
       <path fill="currentColor"
@@ -48,12 +40,7 @@ export default {
     defaultMenuCollapseLevel: 2
   },
   footer: {
-    text: (
-      <>
-        {`${new Date().getFullYear()}${String.fromCodePoint(160, 169, 160)}`}<a href="https://trautmann.software"
-                                                                                target="_blank">Trautmann Software</a>.
-      </>
-    )
+    text: <FooterText />
   },
   gitTimestamp: Timestamp,
   // Set the repository URL of the documentation. It’s used to generate the “Edit this page” link and the “Feedback” link.

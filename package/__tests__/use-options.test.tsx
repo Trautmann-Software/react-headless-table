@@ -3,6 +3,7 @@ import '@testing-library/jest-dom';
 import { TestComponentProvider } from './test-component-provider';
 import { CustomColumn, CustomOptions, Data } from './test-data';
 import { useOptions } from '../src';
+import { Fragment } from 'react';
 
 function TestComponent() {
   const { internationalizationOptions, rowOptions, paginationOptions, ...customOptions } = useOptions<
@@ -11,7 +12,7 @@ function TestComponent() {
     Data
   >();
   return (
-    <>
+    <Fragment>
       <ul role="internationalizationOptions">
         <li data-testid="internationalizationOptions-locale">{internationalizationOptions.locale}</li>
         <li data-testid="internationalizationOptions-collatorOptions">
@@ -78,7 +79,7 @@ function TestComponent() {
           .sort()
           .join(',')}
       </p>
-    </>
+    </Fragment>
   );
 }
 

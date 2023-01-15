@@ -4,12 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { TestComponentProvider } from './test-component-provider';
 import { CustomFilter } from './test-data';
 import { useFilters } from '../src';
+import { Fragment } from 'react';
 
 function TestComponent() {
   const { filters, addFilter, updateFilter, removeFilter } = useFilters<CustomFilter>();
 
   return (
-    <>
+    <Fragment>
       <ul>
         {filters.map((filter) => (
           <li key={filter.id} role="filters" data-testid={`filter-${filter.id}`}>
@@ -52,7 +53,7 @@ function TestComponent() {
       <button role="remove-filter" onClick={() => removeFilter('added')}>
         remove-filter
       </button>
-    </>
+    </Fragment>
   );
 }
 

@@ -3,11 +3,12 @@ import '@testing-library/jest-dom';
 import { TestComponentProvider } from './test-component-provider';
 import { useRows } from '../src';
 import { Data, testRows } from './test-data';
+import { Fragment } from 'react';
 
 function TestComponent() {
   const { rows } = useRows<Data>();
   return (
-    <>
+    <Fragment>
       <ul>
         {rows.map((row) => (
           <li key={row.id} role="rows" data-testid={`row-${row.data.username}`}>
@@ -15,7 +16,7 @@ function TestComponent() {
           </li>
         ))}
       </ul>
-    </>
+    </Fragment>
   );
 }
 

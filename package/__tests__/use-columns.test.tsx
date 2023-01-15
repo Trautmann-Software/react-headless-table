@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { TestComponentProvider } from './test-component-provider';
 import { CustomColumn, Data } from './test-data';
 import { defined } from '../src/utils';
+import { Fragment } from 'react';
 
 const testColumns: Array<Column<Data, CustomColumn>> = [
   { field: 'string', type: 'string', customColumnField: 'customColumnFieldValue' },
@@ -33,7 +34,7 @@ function TestComponent() {
   >();
 
   return (
-    <>
+    <Fragment>
       <ul>
         {columns.map((column) => (
           <li key={column.id} role="columns" data-testid={`column-${column.id}`}>
@@ -80,7 +81,7 @@ function TestComponent() {
       <button role="toggle-sort-string" onClick={() => toggleSort('string')}>
         toggle-sort-string
       </button>
-    </>
+    </Fragment>
   );
 }
 

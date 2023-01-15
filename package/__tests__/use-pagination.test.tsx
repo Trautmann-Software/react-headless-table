@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { TestComponentProvider } from './test-component-provider';
 import { usePagination } from '../src';
 import { faker } from '@faker-js/faker';
+import { Fragment } from 'react';
 
 type User = {
   username: string;
@@ -32,7 +33,7 @@ function TestComponent() {
     setPageSize,
   } = usePagination<User>();
   return (
-    <>
+    <Fragment>
       <ul>
         {pageRows.map((row) => (
           <li key={row.id} role="row">
@@ -55,17 +56,17 @@ function TestComponent() {
       <button role="page-size-12" onClick={() => setPageSize(12)} />
       <button role="page-size-6" onClick={() => setPageSize(6)} />
       <button role="page-size-5" onClick={() => setPageSize((prevState) => prevState - 1)} />
-    </>
+    </Fragment>
   );
 }
 
 test('usePagination hook performs correctly', async () => {
   render(
-    <>
+    <Fragment>
       <TestComponentProvider rows={testUsers}>
         <TestComponent />
       </TestComponentProvider>
-    </>
+    </Fragment>
   );
 
   let rows = screen.queryAllByRole('row');

@@ -4,13 +4,14 @@ import { TestComponentProvider } from './test-component-provider';
 import { useRows, useSearchQuery } from '../src';
 import { Data, testColumns, testRows } from './test-data';
 import userEvent from '@testing-library/user-event';
+import { Fragment } from 'react';
 
 function TestComponent() {
   const { rows } = useRows<Data>();
   const { searchQuery, setSearchQuery } = useSearchQuery();
 
   return (
-    <>
+    <Fragment>
       <input
         role="search-input"
         type="text"
@@ -25,7 +26,7 @@ function TestComponent() {
           </li>
         ))}
       </ul>
-    </>
+    </Fragment>
   );
 }
 

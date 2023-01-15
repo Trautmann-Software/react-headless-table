@@ -4,13 +4,14 @@ import { TestComponentProvider } from './test-component-provider';
 import { useFilters, useRows } from '../src';
 import { Data, testColumns, testRows } from './test-data';
 import userEvent from '@testing-library/user-event';
+import { Fragment } from 'react';
 
 function TestComponent() {
   const { rows } = useRows<Data>();
   const { addFilter, updateFilter, removeFilter } = useFilters<{}, Data>();
 
   return (
-    <>
+    <Fragment>
       <ul>
         {rows.map((row) => (
           <li key={row.id} role="rows" data-testid={`row-${row.data.username}`}>
@@ -54,7 +55,7 @@ function TestComponent() {
       >
         remove-filter
       </button>
-    </>
+    </Fragment>
   );
 }
 

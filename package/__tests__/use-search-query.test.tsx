@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { TestComponentProvider } from './test-component-provider';
+import { Fragment } from 'react';
 
 function TestComponent({ prefix }: { prefix: string }) {
   const { searchQuery, setSearchQuery } = useSearchQuery();
@@ -19,14 +20,14 @@ function TestComponent({ prefix }: { prefix: string }) {
 
 test('useSearchQuery hook delivers correct search query', async () => {
   render(
-    <>
+    <Fragment>
       <TestComponentProvider searchQuery="abc">
         <TestComponent prefix="a" />
       </TestComponentProvider>
       <TestComponentProvider searchQuery="xyz">
         <TestComponent prefix="b" />
       </TestComponentProvider>
-    </>
+    </Fragment>
   );
 
   expect(screen.getByRole('a-search-input')).toHaveValue('abc');

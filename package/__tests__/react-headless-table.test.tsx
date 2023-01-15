@@ -1,9 +1,9 @@
-import { Column, useColumns, useSearchQuery } from '../src';
+import { Column, useColumns, useRows, useSearchQuery } from '../src';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { TestComponentProvider } from './test-component-provider';
-import { useRows } from '../src';
+import { Fragment } from 'react';
 
 type RowData = {
   stringField: string;
@@ -103,7 +103,7 @@ function TestComponent() {
   const { columns } = useColumns<RowData>();
   const { rows } = useRows<RowData>();
   return (
-    <>
+    <Fragment>
       <input
         role="search-input"
         type="text"
@@ -136,7 +136,7 @@ function TestComponent() {
           ))}
         </tbody>
       </table>
-    </>
+    </Fragment>
   );
 }
 
