@@ -8,8 +8,9 @@
     "gatsby"
   ],
   "scripts": {
+    "docgen": "esno scripts/docgen",
     "dev": "next dev",
-    "build": "next build && next-sitemap && next export",
+    "build": "npm run docgen && next build && next-sitemap && next export",
     "start": "next start",
     "lint": "next lint"
   },
@@ -17,12 +18,16 @@
     "@next/font": "13.1.2",
     "@trautmann/react-headless-table": "*",
     "@types/node": "18.11.18",
+    "@types/fs-extra": "^11.0.1",
+    "esno": "^0.16.3",
+    "fs-extra": "^11.1.0",
     "next": "13.1.2",
     "next-pwa": "^5.6.0",
     "next-sitemap": "^3.1.45",
     "nextra": "2.0.3",
     "nextra-theme-docs": "2.0.3",
     "react": "^18.2.0",
+    "react-docgen-typescript": "^2.2.2",
     "react-dom": "^18.2.0"
   }
 }

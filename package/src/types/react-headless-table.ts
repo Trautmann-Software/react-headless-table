@@ -15,9 +15,25 @@ export type ReactHeadlessTableProps<
   CustomOptions extends Record<string, any> = {},
   CustomFilter extends Record<string, any> = {}
 > = PropsWithChildren<{
+  /**
+   * Extendable options.
+   */
   options?: Options<CustomOptions, CustomColumn, RowData>;
+  /**
+   * Extendable column entries.
+   */
   columns: Array<Column<RowData, CustomColumn>>;
+  /**
+   * Initial search query.
+   * @default undefined
+   */
   searchQuery?: string;
+  /**
+   * Row entries.
+   */
   rows: Array<RowData>;
+  /**
+   * Initial filters to apply.
+   */
   filters?: Array<Filter<CustomFilter, RowData>>;
 }>;
