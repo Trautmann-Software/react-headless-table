@@ -15,10 +15,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/server": "^11.10.0",
+    "@mantine/core": "^5.10.0",
+    "@mantine/hooks": "^5.10.0",
+    "@mantine/next": "^5.10.0",
     "@next/font": "13.1.2",
     "@trautmann/react-headless-table": "*",
-    "@types/node": "18.11.18",
     "@types/fs-extra": "^11.0.1",
+    "@types/node": "18.11.18",
     "esno": "^0.16.3",
     "fs-extra": "^11.1.0",
     "next": "13.1.2",
