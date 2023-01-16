@@ -25,8 +25,8 @@ const columns: Array<Column<RowData, CustomColumn<RowData>>> = [
       <Fragment>
         <Code>{row.data?.name}</Code>
         {row.data?.required && (
-          <Text fz="xs" fw={500}>
-            required
+          <Text component="span" fz="md">
+            *
           </Text>
         )}
       </Fragment>
@@ -65,5 +65,5 @@ export function PropsTable({ of }: Props) {
   const componentProps = docgenData.find((entry) => entry.displayName === of.name)?.props;
   const rows = Object.values(componentProps ?? {});
 
-  return <MantineTable columns={columns} rows={rows} />;
+  return <MantineTable columns={columns} rows={rows} caption="* required prop" />;
 }

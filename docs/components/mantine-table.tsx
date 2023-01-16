@@ -5,28 +5,36 @@ import {
   ReactHeadlessTable,
   ReactHeadlessTableProps,
   Row,
-  useColumns, useRows,
-  useSearchQuery
+  useColumns,
+  useRows,
+  useSearchQuery,
 } from '@trautmann/react-headless-table';
+import { IconSearch } from '@tabler/icons';
 
 export type CustomColumn<RowData extends Record<string, any> = {}> = {
   title: string;
   render?: (row: Row<RowData>) => ReactNode;
 };
 
-export function MantineTable<RowData extends Record<string, any> = {}>(
-  props: Omit<ReactHeadlessTableProps<RowData, CustomColumn<RowData>>, 'children'>
-) {
+type Props<RowData extends Record<string, any> = {}> = Omit<
+  ReactHeadlessTableProps<RowData, CustomColumn<RowData>>,
+  'children'
+> & {
+  caption?: ReactNode;
+};
+
+export function MantineTable<RowData extends Record<string, any> = {}>({ caption, ...props }: Props<RowData>) {
   return (
     <ReactHeadlessTable {...props}>
       <Mantine>
-        <MantineTableInner />
+        <MantineTableInner caption={caption} />
       </Mantine>
     </ReactHeadlessTable>
   );
 }
 
-function MantineTableInner<RowData extends Record<string, any> = {}>() {
+type InnerProps<RowData extends Record<string, any> = {}> = Pick<Props<RowData>, 'caption'>;
+function MantineTableInner<RowData extends Record<string, any> = {}>({ caption }: InnerProps) {
   const { searchQuery, setSearchQuery } = useSearchQuery();
   const { columns } = useColumns<RowData, CustomColumn<RowData>>();
   const { rows } = useRows<RowData>();
@@ -34,12 +42,13 @@ function MantineTableInner<RowData extends Record<string, any> = {}>() {
   return (
     <Stack sx={{ marginTop: 8, marginBottom: 8 }}>
       <TextInput
-        type="text"
+        type="search"
         placeholder="Search"
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.currentTarget.value)}
+        icon={<IconSearch size={14} />}
       />
-      <Table striped>
+      <Table striped withBorder captionSide="bottom">
         <thead>
           <tr>
             {columns.map((column) => (
@@ -58,6 +67,7 @@ function MantineTableInner<RowData extends Record<string, any> = {}>() {
             </tr>
           ))}
         </tbody>
+        {caption && <caption style={{ textAlign: 'left' }}>{caption}</caption>}
       </Table>
     </Stack>
   );

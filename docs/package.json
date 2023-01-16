@@ -21,6 +21,7 @@
     "@mantine/hooks": "^5.10.0",
     "@mantine/next": "^5.10.0",
     "@next/font": "13.1.2",
+    "@tabler/icons": "^1.119.0",
     "@trautmann/react-headless-table": "*",
     "@types/fs-extra": "^11.0.1",
     "@types/node": "18.11.18",
