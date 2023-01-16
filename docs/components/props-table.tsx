@@ -1,8 +1,8 @@
 import { Fragment, FunctionComponent } from 'react';
-import docgenData from '../.docgen/docgen.json';
+import docgenData from '../.docgen/docgen.json' assert { type: 'json' };
 import { Code, Text } from '@mantine/core';
 import { CustomColumn, MantineTable } from './mantine-table';
-import { Column } from '@trautmann/react-headless-table/dist/src';
+import { Column } from '@trautmann/react-headless-table';
 
 type RowData = {
   name?: string;

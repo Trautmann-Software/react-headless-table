@@ -1,4 +1,4 @@
-import { ReactHeadlessTableProps, UseSearchQuery } from '@trautmann/react-headless-table/dist/src';
+import { ReactHeadlessTableProps, UseSearchQuery } from '@trautmann/react-headless-table';
 import { Fragment } from 'react';
 
 export function ReactHeadlessTable<

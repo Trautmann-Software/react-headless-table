@@ -1,8 +1,13 @@
-import type { ReactHeadlessTableProps, Row } from '@trautmann/react-headless-table';
-import { ReactHeadlessTable, useColumns, useRows, useSearchQuery } from '@trautmann/react-headless-table';
 import { Mantine } from './mantine';
 import { Stack, Table, TextInput } from '@mantine/core';
 import { ReactNode } from 'react';
+import {
+  ReactHeadlessTable,
+  ReactHeadlessTableProps,
+  Row,
+  useColumns, useRows,
+  useSearchQuery
+} from '@trautmann/react-headless-table';
 
 export type CustomColumn<RowData extends Record<string, any> = {}> = {
   title: string;
@@ -36,22 +41,22 @@ function MantineTableInner<RowData extends Record<string, any> = {}>() {
       />
       <Table striped>
         <thead>
-        <tr>
-          {columns.map((column) => (
-            <td key={column.id}>{column.title}</td>
-          ))}
-        </tr>
-        </thead>
-        <tbody>
-        {rows.map((row) => (
-          <tr key={row.id}>
+          <tr>
             {columns.map((column) => (
-              <td key={column.id} valign="top">
-                {column.render ? column.render(row) : String(column.value(row) ?? '-')}
-              </td>
+              <td key={column.id}>{column.title}</td>
             ))}
           </tr>
-        ))}
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id}>
+              {columns.map((column) => (
+                <td key={column.id} valign="top">
+                  {column.render ? column.render(row) : String(column.value(row) ?? '-')}
+                </td>
+              ))}
+            </tr>
+          ))}
         </tbody>
       </Table>
     </Stack>
