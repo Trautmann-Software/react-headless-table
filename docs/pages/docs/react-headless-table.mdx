@@ -1,13 +1,12 @@
 import { Tab, Tabs } from 'nextra-theme-docs';
-import { NpmIcon, TabItem, YarnIcon } from '../../../components';
+import { JsIcon, PropsTable, ReactHeadlessTable, TabItem, TsIcon } from '../../components';
 
-## Installation
+<PropsTable of={ReactHeadlessTable} />
 
-Install the package and its dependencies:
 <Tabs
   items={[
-    <TabItem label="npm" icon={<NpmIcon />} />,
-    <TabItem label="yarn" icon={<YarnIcon />} />
+    <TabItem icon={<TsIcon />} />,
+    <TabItem icon={<JsIcon />} />
   ]}
 >
   <Tab>

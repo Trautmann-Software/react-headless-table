@@ -3,9 +3,9 @@
   "---": {
     "type": "separator"
   },
+  "react-headless-table": "ReactHeadlessTable",
   "hooks": "Hooks",
   "---": {
     "type": "separator"
-  },
-  "banana": "Banana"
+  }
 }

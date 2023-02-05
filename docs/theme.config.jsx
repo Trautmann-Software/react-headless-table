@@ -3,6 +3,7 @@ import { Timestamp } from './theme-components/timestamp';
 import { FooterText } from './theme-components/footer-text';
 import { Logo } from './theme-components/logo';
 import { Head } from './theme-components/head';
+import { NpmIcon } from './components';
 
 export default {
   head: Head,
@@ -21,12 +22,7 @@ export default {
   chat: {
     link: 'https://www.npmjs.com/package/@trautmann/react-headless-table',
     // If icon is missing, it will be a Discord icon by default.
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 27.23 27.23">
-        <rect fill="#333333" width="27.23" height="27.23" rx="2"></rect>
-        <polygon fill="#fff" points="5.8 21.75 13.66 21.75 13.67 9.98 17.59 9.98 17.58 21.76 21.51 21.76 21.52 6.06 5.82 6.04 5.8 21.75"></polygon>
-      </svg>
-    )
+    icon: <NpmIcon width={24} height={24} />
   },
   /*banner: {
     dismissible: true,
