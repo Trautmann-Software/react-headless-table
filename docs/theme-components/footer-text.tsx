@@ -7,7 +7,6 @@ export function FooterText() {
       <a href="https://trautmann.software" target="_blank">
         Trautmann Software
       </a>
-      .
     </Fragment>
   );
 }
