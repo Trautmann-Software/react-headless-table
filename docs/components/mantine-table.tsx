@@ -9,7 +9,7 @@ import {
   useRows,
   useSearchQuery,
 } from '@trautmann/react-headless-table';
-import { IconSearch } from '@tabler/icons';
+import { IconSearch } from '@tabler/icons-react';
 
 export type CustomColumn<RowData extends Record<string, any> = {}> = {
   title: string;
