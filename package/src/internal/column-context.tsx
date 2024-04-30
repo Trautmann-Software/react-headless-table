@@ -19,7 +19,7 @@ import { useOptions } from '../hooks';
  */
 export type ColumnContextProps<
   RowData extends Record<string, any> = {},
-  CustomColumn extends Record<string, any> = {}
+  CustomColumn extends Record<string, any> = {},
 > = UseColumns<RowData, CustomColumn>;
 
 export const ColumnContext = createContext<ColumnContextProps>({
@@ -34,7 +34,7 @@ export const ColumnContext = createContext<ColumnContextProps>({
 
 type Props<
   RowData extends Record<string, any> = {},
-  CustomColumn extends Record<string, any> = {}
+  CustomColumn extends Record<string, any> = {},
 > = PropsWithChildren<{
   columns: Array<Column<RowData, CustomColumn>>;
 }>;
@@ -45,7 +45,7 @@ type Props<
  */
 export function ColumnContextProvider<
   RowData extends Record<string, any> = {},
-  CustomColumn extends Record<string, any> = {}
+  CustomColumn extends Record<string, any> = {},
 >(props: Props<RowData, CustomColumn>) {
   const { children, columns: passedColumns } = props;
   const deferredPassedColumns = useDeferredValue(passedColumns);
@@ -178,7 +178,7 @@ export function ColumnContextProvider<
         sortingDirection: column.sortingDirection ?? undefined,
         sortFn: column.sortFn ?? builtInSortFn({ ...column, value: builtInValueFn(column) }),
         order: column.order ?? order,
-      } as ExtendedColumn<RowData, CustomColumn>),
+      }) as ExtendedColumn<RowData, CustomColumn>,
     [builtInSearchFn, builtInSortFn]
   );
 

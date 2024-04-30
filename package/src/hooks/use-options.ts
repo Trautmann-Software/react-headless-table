@@ -12,7 +12,7 @@ import { OptionsContext, OptionsContextProps } from '../internal/options-context
 export function useOptions<
   CustomOptions extends Record<string, any> = {},
   CustomColumn extends Record<string, any> = {},
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 >(): UseOptions<CustomOptions, CustomColumn, RowData> {
   const options = useContext<OptionsContextProps<CustomOptions, CustomColumn, RowData>>(
     OptionsContext as Context<OptionsContextProps<CustomOptions, CustomColumn, RowData>>

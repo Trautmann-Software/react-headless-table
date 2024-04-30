@@ -96,7 +96,7 @@ export type Options<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   CustomColumn extends Record<string, any> = {},
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 > = { [Key in keyof CustomOptions]: Key extends undefined ? never : CustomOptions[Key] } & {
   /**
    * Internationalization options for supported value types.
@@ -124,7 +124,7 @@ export type UseOptions<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   CustomColumn extends Record<string, any> = {},
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 > = { [Key in keyof CustomOptions]: Key extends undefined ? never : CustomOptions[Key] } & {
   /**
    * Internationalization options for supported value types.

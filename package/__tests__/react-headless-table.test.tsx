@@ -174,8 +174,6 @@ test('react-headless-table provides correct data to render a table', async () =>
   );
 
   // Table cells
-  const tableCells = screen.getAllByRole('table-row-', { exact: false });
-  expect(tableCells).toHaveLength(9 * 6);
   const tableCellsString1 = screen.getAllByRole('table-row-string-1-cell');
   expect(tableCellsString1).toHaveLength(9);
   [
@@ -191,6 +189,11 @@ test('react-headless-table provides correct data to render a table', async () =>
   ].forEach((field, index) =>
     expect(tableCellsString1[index]).toHaveAttribute('data-testid', `table-row-string-1-cell-${field}`)
   );
+  expect(screen.getAllByRole('table-row-string-2-cell')).toHaveLength(9);
+  expect(screen.getAllByRole('table-row-string-3-cell')).toHaveLength(9);
+  expect(screen.getAllByRole('table-row-string-4-cell')).toHaveLength(9);
+  expect(screen.getAllByRole('table-row-string-5-cell')).toHaveLength(9);
+  expect(screen.getAllByRole('table-row-string-6-cell')).toHaveLength(9);
   //#endregion Initial state
 
   // Search and check rows

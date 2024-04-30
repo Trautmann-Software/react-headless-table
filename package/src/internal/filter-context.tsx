@@ -18,7 +18,7 @@ import { noop } from '../utils';
  */
 export type FilterContextProps<
   CustomFilter extends Record<string, any> = {},
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 > = UseFilters<CustomFilter, RowData>;
 
 export const FilterContext = createContext<FilterContextProps>({
@@ -31,7 +31,7 @@ export const FilterContext = createContext<FilterContextProps>({
 
 type Props<
   CustomFilter extends Record<string, any> = {},
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 > = PropsWithChildren<{
   filters?: Array<Filter<CustomFilter, RowData>>;
 }>;
@@ -42,7 +42,7 @@ type Props<
  */
 export function FilterContextProvider<
   CustomFilter extends Record<string, any> = {},
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 >(props: Props<CustomFilter, RowData>) {
   const { children, filters: passedFilters } = props;
   const deferredPassedFilters = useDeferredValue(passedFilters);

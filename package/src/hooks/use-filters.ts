@@ -4,7 +4,7 @@ import { FilterContext, FilterContextProps } from '../internal/filter-context';
 
 export function useFilters<
   CustomFilter extends Record<string, any> = {},
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 >(): UseFilters<CustomFilter, RowData> {
   const { filters, addFilter, updateFilter, removeFilter, isFiltersUpdatePending } = useContext<
     FilterContextProps<CustomFilter, RowData>

@@ -13,7 +13,7 @@ export type ReactHeadlessTableProps<
   RowData extends Record<string, any> = {},
   CustomColumn extends Record<string, any> = {},
   CustomOptions extends Record<string, any> = {},
-  CustomFilter extends Record<string, any> = {}
+  CustomFilter extends Record<string, any> = {},
 > = PropsWithChildren<{
   /**
    * Extendable options.

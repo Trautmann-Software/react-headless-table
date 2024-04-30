@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid';
 export type OptionsContextProps<
   CustomOptions extends Record<string, any> = {},
   CustomColumn extends Record<string, any> = {},
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 > = UseOptions<CustomOptions, CustomColumn, RowData>;
 
 const idFn = () => uuid();
@@ -50,7 +50,7 @@ export const OptionsContext = createContext<OptionsContextProps>(defaultOptions)
 type Props<
   CustomOptions extends Record<string, any> = {},
   CustomColumn extends Record<string, any> = {},
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 > = PropsWithChildren<{
   options?: Options<CustomOptions, CustomColumn, RowData>;
 }>;
@@ -63,7 +63,7 @@ type Props<
 export function OptionsContextProvider<
   CustomOptions extends Record<string, any> = {},
   CustomColumn extends Record<string, any> = {},
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 >(props: Props<CustomOptions, CustomColumn, RowData>) {
   const { children, options: passedOptions } = props;
   const deferredOptions = useDeferredValue(passedOptions);
