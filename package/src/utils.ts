@@ -63,6 +63,7 @@ export function valueFn<RowData extends Record<string, any> = {}>(
       return (row: Row<RowData>) => (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as undefined;
   }
 }
+
 export function untypedValueFn<RowData extends Record<string, any> = {}>(
   column: Column<RowData>
 ): ExtendedColumn<RowData>['value'] {
@@ -86,13 +87,34 @@ export function untypedValueFn<RowData extends Record<string, any> = {}>(
   ? column.value(row)
   : rowA.data?.[column.field as keyof RowData]);*/
 
+//#region Bigint
+export const compareBigintValues = (a: bigint | undefined, b: bigint | undefined) => {
+  const difference = (a ?? 0n) - (b ?? 0n);
+  if (difference === 0n) {
+    return 0;
+  } else {
+    return difference > 0n ? 1 : -1;
+  }
+};
+//#endregion Bigint
+
 //#region Date/Time
 export const dateToNumber = (date: Date) =>
   date.getFullYear() * 100_00 +
   (date.getFullYear() < 0 ? -1 : 1) * (date.getMonth() + 1) * 100 +
   (date.getFullYear() < 0 ? -1 : 1) * date.getDate();
 
+export const compareDates = (a: Date | undefined, b: Date | undefined) => (
+  dateToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
+  dateToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
+);
+
 export const timeToNumber = (time: Date) => time.getHours() * 100_00 + time.getMinutes() * 100 + time.getSeconds();
+
+export const compareTimes = (a: Date | undefined, b: Date | undefined) => (
+  timeToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
+  timeToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
+);
 
 export const datetimeToNumber = (datetime: Date) =>
   datetime.getFullYear() * 100_00_00_00_00 +
@@ -101,6 +123,11 @@ export const datetimeToNumber = (datetime: Date) =>
   (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getHours() * 100_00 +
   (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getMinutes() * 100 +
   (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getSeconds();
+
+export const compareDateTimes = (a: Date | undefined, b: Date | undefined) => (
+  datetimeToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
+  datetimeToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
+);
 //#endregion Date/Time
 
 //#region Stringify
@@ -202,4 +229,5 @@ export function generateString<RowData extends Record<string, any> = {}>(
       return '';
   }
 }
+
 //#endregion Stringify

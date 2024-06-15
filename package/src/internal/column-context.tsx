@@ -1,13 +1,14 @@
 import { createContext, PropsWithChildren, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { Column, ExtendedColumn, Row } from '../types';
 import {
-  datetimeToNumber,
-  dateToNumber,
+  compareBigintValues,
+  compareDates,
+  compareDateTimes,
+  compareTimes,
   generateString,
   GenerateStringOptions,
-  timeToNumber,
   untypedValueFn,
-  valueFn,
+  valueFn
 } from '../utils';
 import { useOptions } from '../hooks/use-options';
 
@@ -23,7 +24,7 @@ export type ColumnContextProps<
 };
 
 export const ColumnContext = createContext<ColumnContextProps>({
-  columns: [],
+  columns: []
 });
 
 type Props<
@@ -64,14 +65,14 @@ export function ColumnContextProvider<
       relativeTimeFormatter:
         column.type === 'relative-time'
           ? new Intl.RelativeTimeFormat(
-              internationalizationOptions.locale,
-              column.formatOptions ?? internationalizationOptions.relativeTimeFormatOptions
-            )
+            internationalizationOptions.locale,
+            column.formatOptions ?? internationalizationOptions.relativeTimeFormatOptions
+          )
           : undefined,
       booleanFormatOptions:
         column.type === 'boolean'
           ? column.formatOptions ?? internationalizationOptions.booleanFormatOptions
-          : undefined,
+          : undefined
     }),
     [
       internationalizationOptions.bigintFormatOptions,
@@ -81,7 +82,7 @@ export function ColumnContextProvider<
       internationalizationOptions.locale,
       internationalizationOptions.numberFormatOptions,
       internationalizationOptions.relativeTimeFormatOptions,
-      internationalizationOptions.timeFormatOptions,
+      internationalizationOptions.timeFormatOptions
     ]
   );
   const builtInSearchFn = useCallback(
@@ -95,6 +96,7 @@ export function ColumnContextProvider<
     () => new Intl.Collator(internationalizationOptions.locale, internationalizationOptions.collatorOptions).compare,
     [internationalizationOptions.collatorOptions, internationalizationOptions.locale]
   );
+
   const builtInSortFn = useCallback<
     (column: Column<RowData, CustomColumn>) => (a: Row<RowData>, b: Row<RowData>) => number
   >(
@@ -111,23 +113,24 @@ export function ColumnContextProvider<
         case 'relative-time':
           return (valueFn(column.type, column.value)(a) ?? 0) - (valueFn(column.type, column.value)(b) ?? 0);
         case 'bigint':
-          const difference =
-            (valueFn(column.type, column.value)(a) ?? 0n) - (valueFn(column.type, column.value)(b) ?? 0n);
-          return difference === 0n ? 0 : difference > 0n ? 1 : -1;
+          return compareBigintValues(
+            valueFn(column.type, column.value)(a),
+            valueFn(column.type, column.value)(b)
+          );
         case 'date':
-          return (
-            dateToNumber(valueFn(column.type, column.value)(a) ?? new Date('0000-01-01')) -
-            dateToNumber(valueFn(column.type, column.value)(b) ?? new Date('0000-01-01'))
+          return compareDates(
+            valueFn(column.type, column.value)(a),
+            valueFn(column.type, column.value)(b)
           );
         case 'time':
-          return (
-            timeToNumber(valueFn(column.type, column.value)(a) ?? new Date('0000-01-01')) -
-            timeToNumber(valueFn(column.type, column.value)(b) ?? new Date('0000-01-01'))
+          return compareTimes(
+            valueFn(column.type, column.value)(a),
+            valueFn(column.type, column.value)(b)
           );
         case 'date-time':
-          return (
-            datetimeToNumber(valueFn(column.type, column.value)(a) ?? new Date('0000-01-01')) -
-            datetimeToNumber(valueFn(column.type, column.value)(b) ?? new Date('0000-01-01'))
+          return compareDateTimes(
+            valueFn(column.type, column.value)(a),
+            valueFn(column.type, column.value)(b)
           );
         default:
           return 0;
@@ -140,14 +143,14 @@ export function ColumnContextProvider<
   const extendedColumns = useMemo<Array<ExtendedColumn<RowData, CustomColumn>>>(
     () =>
       deferredColumns.map((column, index) => ({
-        ...(column as Column<RowData, CustomColumn>),
+        ...(column),
         value: untypedValueFn(column),
         hidden: column.hidden ?? false,
         searchable: column.searchable ?? true,
         searchFn: column.searchFn ?? builtInSearchFn(column),
         filterable: column.filterable ?? true,
         sortFn: column.sortFn ?? builtInSortFn(column),
-        order: column.order ?? index,
+        order: column.order ?? index
       })) as Array<ExtendedColumn<RowData, CustomColumn>>,
     [builtInSearchFn, builtInSortFn, deferredColumns]
   );
