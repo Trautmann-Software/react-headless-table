@@ -5,11 +5,17 @@ import {
   datetimeToNumber,
   dateToNumber,
   defined,
+  compareBigintValues,
+  compareDates,
+  compareDateTimes,
+  compareTimes,
   generateString,
   GenerateStringOptions,
   getNextSortingDirection,
   noop,
   timeToNumber,
+  untypedValueFn,
+  valueFn
 } from '../utils';
 import { useOptions } from '../hooks';
 
@@ -80,7 +86,7 @@ export function ColumnContextProvider<
       booleanFormatOptions:
         column.type === 'boolean'
           ? column.formatOptions ?? internationalizationOptions.booleanFormatOptions
-          : undefined,
+          : undefined
     }),
     [
       internationalizationOptions.bigintFormatOptions,
@@ -90,7 +96,7 @@ export function ColumnContextProvider<
       internationalizationOptions.locale,
       internationalizationOptions.numberFormatOptions,
       internationalizationOptions.relativeTimeFormatOptions,
-      internationalizationOptions.timeFormatOptions,
+      internationalizationOptions.timeFormatOptions
     ]
   );
   const builtInSearchFn = useCallback(
@@ -104,6 +110,7 @@ export function ColumnContextProvider<
     () => new Intl.Collator(internationalizationOptions.locale, internationalizationOptions.collatorOptions).compare,
     [internationalizationOptions.collatorOptions, internationalizationOptions.locale]
   );
+
   const builtInSortFn = useCallback<
     (
       column: Column<RowData, CustomColumn>
@@ -132,30 +139,30 @@ export function ColumnContextProvider<
             // @ts-ignore
             return directionMultiplicative * ((builtInValueFn(column)(a) ?? 0) - (builtInValueFn(column)(b) ?? 0));
           case 'bigint':
-            // eslint-disable-next-line
-            // @ts-ignore
-            const difference = (builtInValueFn(column)(a) ?? 0n) - (builtInValueFn(column)(b) ?? 0n);
-            return difference === 0n ? 0 : directionMultiplicative * (difference > 0n ? 1 : -1);
+            return directionMultiplicative * compareBigintValues(
+              valueFn(column.type, column.value)(a),
+              valueFn(column.type, column.value)(b)
+            );
           case 'date':
             return (
-              directionMultiplicative *
-              // eslint-disable-next-line
-              // @ts-ignore
-              (dateToNumber(builtInValueFn(column)(a)) - dateToNumber(builtInValueFn(column)(b)))
+              directionMultiplicative * compareDates(
+                valueFn(column.type, column.value)(a),
+                valueFn(column.type, column.value)(b)
+              )
             );
           case 'time':
             return (
-              directionMultiplicative *
-              // eslint-disable-next-line
-              // @ts-ignore
-              (timeToNumber(builtInValueFn(column)(a)) - timeToNumber(builtInValueFn(column)(b)))
+              directionMultiplicative * compareTimes(
+                valueFn(column.type, column.value)(a),
+                valueFn(column.type, column.value)(b)
+              )
             );
           case 'date-time':
             return (
-              directionMultiplicative *
-              // eslint-disable-next-line
-              // @ts-ignore
-              (datetimeToNumber(builtInValueFn(column)(a)) - datetimeToNumber(builtInValueFn(column)(b)))
+              directionMultiplicative * compareDateTimes(
+                valueFn(column.type, column.value)(a),
+                valueFn(column.type, column.value)(b)
+              )
             );
           default:
             return 0;

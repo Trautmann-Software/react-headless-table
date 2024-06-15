@@ -27,6 +27,17 @@ export function builtInValueFn<RowData extends Record<string, any> = {}>(
 }
 //#endregion Column['value']
 
+//#region Bigint
+export const compareBigintValues = (a: bigint | undefined, b: bigint | undefined) => {
+  const difference = (a ?? 0n) - (b ?? 0n);
+  if (difference === 0n) {
+    return 0;
+  } else {
+    return difference > 0n ? 1 : -1;
+  }
+};
+//#endregion Bigint
+
 //#region Date/Time
 export const dateToNumber = (date: Date | undefined) =>
   defined(date)
@@ -35,8 +46,18 @@ export const dateToNumber = (date: Date | undefined) =>
       (date.getFullYear() < 0 ? -1 : 1) * date.getDate()
     : 0;
 
+export const compareDates = (a: Date | undefined, b: Date | undefined) => (
+  dateToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
+  dateToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
+);
+
 export const timeToNumber = (time: Date | undefined) =>
   defined(time) ? time.getHours() * 100_00 + time.getMinutes() * 100 + time.getSeconds() : 0;
+
+export const compareTimes = (a: Date | undefined, b: Date | undefined) => (
+  timeToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
+  timeToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
+);
 
 export const datetimeToNumber = (datetime: Date | undefined) =>
   defined(datetime)
@@ -47,6 +68,11 @@ export const datetimeToNumber = (datetime: Date | undefined) =>
       (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getMinutes() * 100 +
       (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getSeconds()
     : 0;
+
+export const compareDateTimes = (a: Date | undefined, b: Date | undefined) => (
+  datetimeToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
+  datetimeToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
+);
 //#endregion Date/Time
 
 //#region Stringify
