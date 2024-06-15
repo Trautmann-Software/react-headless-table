@@ -10,7 +10,7 @@ import {
   generateString,
   GenerateStringOptions,
   getNextSortingDirection,
-  noop
+  noop,
 } from '../utils';
 import { useOptions } from '../hooks';
 
@@ -30,7 +30,7 @@ export const ColumnContext = createContext<ColumnContextProps>({
   toggleColumnVisibility: noop,
   swapColumnOrder: noop,
   sort: noop,
-  toggleSort: noop
+  toggleSort: noop,
 });
 
 type Props<
@@ -74,14 +74,14 @@ export function ColumnContextProvider<
       relativeTimeFormatter:
         column.type === 'relative-time'
           ? new Intl.RelativeTimeFormat(
-            internationalizationOptions.locale,
-            column.formatOptions ?? internationalizationOptions.relativeTimeFormatOptions
-          )
+              internationalizationOptions.locale,
+              column.formatOptions ?? internationalizationOptions.relativeTimeFormatOptions
+            )
           : undefined,
       booleanFormatOptions:
         column.type === 'boolean'
           ? column.formatOptions ?? internationalizationOptions.booleanFormatOptions
-          : undefined
+          : undefined,
     }),
     [
       internationalizationOptions.bigintFormatOptions,
@@ -91,7 +91,7 @@ export function ColumnContextProvider<
       internationalizationOptions.locale,
       internationalizationOptions.numberFormatOptions,
       internationalizationOptions.relativeTimeFormatOptions,
-      internationalizationOptions.timeFormatOptions
+      internationalizationOptions.timeFormatOptions,
     ]
   );
   const builtInSearchFn = useCallback(
@@ -122,41 +122,46 @@ export function ColumnContextProvider<
           case 'multi-string':
           case 'boolean':
             return (
-              directionMultiplicative * compareStrings(
+              directionMultiplicative *
+              compareStrings(
                 generateString(a, column, generateStringOptions(column)),
                 generateString(b, column, generateStringOptions(column))
               )
             );
           case 'number':
-            return directionMultiplicative * (
-              (builtInValueFn<'number', RowData>(column)(a) ?? 0) - (builtInValueFn<'number', RowData>(column)(b) ?? 0)
+            return (
+              directionMultiplicative *
+              ((builtInValueFn<'number', RowData>(column)(a) ?? 0) -
+                (builtInValueFn<'number', RowData>(column)(b) ?? 0))
             );
           case 'relative-time':
-            return directionMultiplicative * (
-              (builtInValueFn<'relative-time', RowData>(column)(a) ?? 0) - (builtInValueFn<'relative-time', RowData>(column)(b) ?? 0)
+            return (
+              directionMultiplicative *
+              ((builtInValueFn<'relative-time', RowData>(column)(a) ?? 0) -
+                (builtInValueFn<'relative-time', RowData>(column)(b) ?? 0))
             );
           case 'bigint':
-            return directionMultiplicative * compareBigintValues(
-              builtInValueFn<'bigint', RowData>(column)(a),
-              builtInValueFn<'bigint', RowData>(column)(b)
+            return (
+              directionMultiplicative *
+              compareBigintValues(
+                builtInValueFn<'bigint', RowData>(column)(a),
+                builtInValueFn<'bigint', RowData>(column)(b)
+              )
             );
           case 'date':
             return (
-              directionMultiplicative * compareDates(
-                builtInValueFn<'date', RowData>(column)(a),
-                builtInValueFn<'date', RowData>(column)(b)
-              )
+              directionMultiplicative *
+              compareDates(builtInValueFn<'date', RowData>(column)(a), builtInValueFn<'date', RowData>(column)(b))
             );
           case 'time':
             return (
-              directionMultiplicative * compareTimes(
-                builtInValueFn<'time', RowData>(column)(a),
-                builtInValueFn<'time', RowData>(column)(b)
-              )
+              directionMultiplicative *
+              compareTimes(builtInValueFn<'time', RowData>(column)(a), builtInValueFn<'time', RowData>(column)(b))
             );
           case 'date-time':
             return (
-              directionMultiplicative * compareDateTimes(
+              directionMultiplicative *
+              compareDateTimes(
                 builtInValueFn<'date-time', RowData>(column)(a),
                 builtInValueFn<'date-time', RowData>(column)(b)
               )
@@ -181,7 +186,7 @@ export function ColumnContextProvider<
         searchFn: column.searchFn ?? builtInSearchFn({ ...column, value: builtInValueFn(column) }),
         sortingDirection: column.sortingDirection ?? undefined,
         sortFn: column.sortFn ?? builtInSortFn({ ...column, value: builtInValueFn(column) }),
-        order: column.order ?? order
+        order: column.order ?? order,
       }) as ExtendedColumn<RowData, CustomColumn>,
     [builtInSearchFn, builtInSortFn]
   );
@@ -222,9 +227,9 @@ export function ColumnContextProvider<
         previousColumns.map((column) =>
           column.id === columnId
             ? {
-              ...column,
-              hidden: true
-            }
+                ...column,
+                hidden: true,
+              }
             : column
         )
       ),
@@ -236,9 +241,9 @@ export function ColumnContextProvider<
         currentColumns.map((column) =>
           column.id === columnId
             ? {
-              ...column,
-              hidden: false
-            }
+                ...column,
+                hidden: false,
+              }
             : column
         )
       ),
@@ -250,9 +255,9 @@ export function ColumnContextProvider<
         currentColumns.map((column) =>
           column.id === columnId
             ? {
-              ...column,
-              hidden: !column.hidden
-            }
+                ...column,
+                hidden: !column.hidden,
+              }
             : column
         )
       ),
@@ -295,7 +300,7 @@ export function ColumnContextProvider<
           toggleColumnVisibility,
           swapColumnOrder,
           sort,
-          toggleSort
+          toggleSort,
         }}
       >
         {children}

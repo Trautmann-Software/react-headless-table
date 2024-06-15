@@ -20,14 +20,29 @@ export const getNextSortingDirection = (sortingDirection: SortingDirection): Sor
 };
 
 //#region Column['value']
-type ColumnType = 'string' | 'number' | 'bigint' | 'boolean' | 'multi-string' | 'date' | 'time' | 'date-time' | 'relative-time';
-type BuiltInValueFnResult<T extends ColumnType, RowData extends Record<string, any>> =
-  T extends 'string' ? ((row: Row<RowData>) => string | undefined)
-  : T extends 'multi-string' ? ((row: Row<RowData>) => Array<string> | undefined)
-  : T extends 'number' | 'relative-time' ? ((row: Row<RowData>) => number | undefined)
-  : T extends 'bigint' ? ((row: Row<RowData>) => bigint | undefined)
-  : T extends 'boolean' ? ((row: Row<RowData>) => boolean | undefined)
-  : T extends 'date' | 'time' | 'date-time' ? ((row: Row<RowData>) => Date | undefined) : unknown;
+type ColumnType =
+  | 'string'
+  | 'number'
+  | 'bigint'
+  | 'boolean'
+  | 'multi-string'
+  | 'date'
+  | 'time'
+  | 'date-time'
+  | 'relative-time';
+type BuiltInValueFnResult<T extends ColumnType, RowData extends Record<string, any>> = T extends 'string'
+  ? (row: Row<RowData>) => string | undefined
+  : T extends 'multi-string'
+    ? (row: Row<RowData>) => Array<string> | undefined
+    : T extends 'number' | 'relative-time'
+      ? (row: Row<RowData>) => number | undefined
+      : T extends 'bigint'
+        ? (row: Row<RowData>) => bigint | undefined
+        : T extends 'boolean'
+          ? (row: Row<RowData>) => boolean | undefined
+          : T extends 'date' | 'time' | 'date-time'
+            ? (row: Row<RowData>) => Date | undefined
+            : unknown;
 
 export function builtInValueFn<T extends ColumnType, RowData extends Record<string, any> = {}>(
   column: Column<RowData>
@@ -57,18 +72,14 @@ export const dateToNumber = (date: Date | undefined) =>
       (date.getFullYear() < 0 ? -1 : 1) * date.getDate()
     : 0;
 
-export const compareDates = (a: Date | undefined, b: Date | undefined) => (
-  dateToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
-  dateToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
-);
+export const compareDates = (a: Date | undefined, b: Date | undefined) =>
+  dateToNumber(a ?? new Date('0000-01-01T00:00:00.000')) - dateToNumber(b ?? new Date('0000-01-01T00:00:00.000'));
 
 export const timeToNumber = (time: Date | undefined) =>
   defined(time) ? time.getHours() * 100_00 + time.getMinutes() * 100 + time.getSeconds() : 0;
 
-export const compareTimes = (a: Date | undefined, b: Date | undefined) => (
-  timeToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
-  timeToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
-);
+export const compareTimes = (a: Date | undefined, b: Date | undefined) =>
+  timeToNumber(a ?? new Date('0000-01-01T00:00:00.000')) - timeToNumber(b ?? new Date('0000-01-01T00:00:00.000'));
 
 export const datetimeToNumber = (datetime: Date | undefined) =>
   defined(datetime)
@@ -80,10 +91,9 @@ export const datetimeToNumber = (datetime: Date | undefined) =>
       (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getSeconds()
     : 0;
 
-export const compareDateTimes = (a: Date | undefined, b: Date | undefined) => (
+export const compareDateTimes = (a: Date | undefined, b: Date | undefined) =>
   datetimeToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
-  datetimeToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
-);
+  datetimeToNumber(b ?? new Date('0000-01-01T00:00:00.000'));
 //#endregion Date/Time
 
 //#region Stringify
