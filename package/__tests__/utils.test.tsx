@@ -1,4 +1,7 @@
 import {
+  compareDates,
+  compareDateTimes,
+  compareTimes,
   datetimeToNumber,
   dateToNumber,
   defined,
@@ -6,19 +9,9 @@ import {
   generateString,
   getNextSortingDirection,
   noop,
-  timeToNumber,
-} from '../src/utils';
-import { Data } from './test-data';
-import {
-  compareDates, compareDateTimes,
-  compareTimes,
-  datetimeToNumber,
-  dateToNumber,
-  defined,
-  equals,
-  noop,
   timeToNumber
 } from '../src/utils';
+import { Data } from './test-data';
 
 test('utils noop', async () => {
   expect(noop()).toBeUndefined();
@@ -62,64 +55,6 @@ test('utils dateToNumber', async () => {
   expect(dateToNumber(new Date('-012000-01-01T11:22:33'))).toBe(-12000_01_01);
   expect(dateToNumber(new Date('-012000-12-31T11:22:33'))).toBe(-12000_12_31);
 });
-
-test('utils timeToNumber', async () => {
-  expect(timeToNumber(undefined)).toBe(0);
-  // A.D.
-  expect(timeToNumber(new Date('2022-01-01T11:22:33'))).toBe(11_22_33);
-  expect(timeToNumber(new Date('2022-12-31T11:22:33.444'))).toBe(11_22_33);
-  expect(timeToNumber(new Date('0500-01-01T11:22:33'))).toBe(11_22_33);
-  expect(timeToNumber(new Date('0500-12-31T11:22:33.444'))).toBe(11_22_33);
-  expect(timeToNumber(new Date('0000-01-01T11:22:33'))).toBe(11_22_33);
-  expect(timeToNumber(new Date('0000-12-31T11:22:33.444'))).toBe(11_22_33);
-  // B.C.
-  expect(timeToNumber(new Date('-000001-01-01T11:22:33.444'))).toBe(11_22_33);
-  expect(timeToNumber(new Date('-000001-12-31T11:22:33.444'))).toBe(11_22_33);
-  expect(timeToNumber(new Date('-012000-01-01T11:22:33.444'))).toBe(11_22_33);
-  expect(timeToNumber(new Date('-012000-12-31T11:22:33.444'))).toBe(11_22_33);
-});
-test('utils datetimeToNumber', async () => {
-  expect(datetimeToNumber(undefined)).toBe(0);
-  // A.D.
-  expect(datetimeToNumber(new Date('2022-01-01T11:22:33'))).toBe(2022_01_01_11_22_33);
-  expect(datetimeToNumber(new Date('2022-12-31T11:22:33.444'))).toBe(2022_12_31_11_22_33);
-  expect(datetimeToNumber(new Date('0500-01-01T11:22:33'))).toBe(500_01_01_11_22_33);
-  expect(datetimeToNumber(new Date('0500-12-31T11:22:33.444'))).toBe(500_12_31_11_22_33);
-  expect(datetimeToNumber(new Date('0000-01-01T11:22:33'))).toBe(1_01_11_22_33);
-  expect(datetimeToNumber(new Date('0000-12-31T11:22:33.444'))).toBe(12_31_11_22_33);
-  // B.C.
-  expect(datetimeToNumber(new Date('-000001-01-01T11:22:33.444'))).toBe(-1_01_01_11_22_33);
-  expect(datetimeToNumber(new Date('-000001-12-31T11:22:33.444'))).toBe(-1_12_31_11_22_33);
-  expect(datetimeToNumber(new Date('-012000-01-01T11:22:33.444'))).toBe(-12000_01_01_11_22_33);
-  expect(datetimeToNumber(new Date('-012000-12-31T11:22:33.444'))).toBe(-12000_12_31_11_22_33);
-});
-//#endregion Date & Time
-
-//#region Stringify
-test('utils generateString', async () => {
-  expect(
-    generateString<Pick<Data, 'username'>>(
-      { id: 'id', data: { username: 'username-1' }, selected: false },
-      { field: 'username', type: 'string', value: (row) => row.data.username },
-      {}
-    )
-  ).toBe('username-1');
-  expect(
-    generateString<Pick<Data, 'age'>>(
-      { id: 'id', data: { age: 45 }, selected: false },
-      { field: 'age', type: 'number', value: (row) => row.data.age },
-      {}
-    )
-  ).toBe('45');
-  expect(
-    generateString<Pick<Data, 'vip'>>(
-      { id: 'id', data: { vip: true }, selected: false },
-      { field: 'vip', type: 'boolean', value: (row) => row.data.vip },
-      { booleanFormatOptions: { true: 'true', false: 'false', empty: '' } }
-    )
-  ).toBe('true');
-});
-//#endregion Stringify
 
 test('utils compareDates', async () => {
   // A.D.
@@ -219,3 +154,30 @@ test('utils compareDateTimes', async () => {
   expect(compareDateTimes(new Date('-012000-11-30T00:00:00.000'), new Date('-012000-12-31T00:00:00.000'))).toBe(1_01_00_00_00);
   expect(compareDateTimes(new Date('-012000-12-30T00:00:00.000'), new Date('-012000-12-31T00:00:00.000'))).toBe(1_00_00_00);
 });
+//#endregion Date & Time
+
+//#region Stringify
+test('utils generateString', async () => {
+  expect(
+    generateString<Pick<Data, 'username'>>(
+      { id: 'id', data: { username: 'username-1' }, selected: false },
+      { field: 'username', type: 'string', value: (row) => row.data.username },
+      {}
+    )
+  ).toBe('username-1');
+  expect(
+    generateString<Pick<Data, 'age'>>(
+      { id: 'id', data: { age: 45 }, selected: false },
+      { field: 'age', type: 'number', value: (row) => row.data.age },
+      {}
+    )
+  ).toBe('45');
+  expect(
+    generateString<Pick<Data, 'vip'>>(
+      { id: 'id', data: { vip: true }, selected: false },
+      { field: 'vip', type: 'boolean', value: (row) => row.data.vip },
+      { booleanFormatOptions: { true: 'true', false: 'false', empty: '' } }
+    )
+  ).toBe('true');
+});
+//#endregion Stringify

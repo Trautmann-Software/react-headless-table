@@ -20,9 +20,20 @@ export const getNextSortingDirection = (sortingDirection: SortingDirection): Sor
 };
 
 //#region Column['value']
-export function builtInValueFn<RowData extends Record<string, any> = {}>(
+type ColumnType = 'string' | 'number' | 'bigint' | 'boolean' | 'multi-string' | 'date' | 'time' | 'date-time' | 'relative-time';
+type BuiltInValueFnResult<T extends ColumnType, RowData extends Record<string, any>> =
+  T extends 'string' ? ((row: Row<RowData>) => string | undefined)
+  : T extends 'multi-string' ? ((row: Row<RowData>) => Array<string> | undefined)
+  : T extends 'number' | 'relative-time' ? ((row: Row<RowData>) => number | undefined)
+  : T extends 'bigint' ? ((row: Row<RowData>) => bigint | undefined)
+  : T extends 'boolean' ? ((row: Row<RowData>) => boolean | undefined)
+  : T extends 'date' | 'time' | 'date-time' ? ((row: Row<RowData>) => Date | undefined) : unknown;
+
+export function builtInValueFn<T extends ColumnType, RowData extends Record<string, any> = {}>(
   column: Column<RowData>
-): ExtendedColumn<RowData>['value'] {
+): BuiltInValueFnResult<T, RowData> {
+  // eslint-disable-next-line
+  // @ts-ignore
   return typeof column.value === 'function' ? column.value : (row: Row<RowData>) => row?.data?.[column.field];
 }
 //#endregion Column['value']

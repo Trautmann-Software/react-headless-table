@@ -2,20 +2,15 @@ import { createContext, PropsWithChildren, useCallback, useDeferredValue, useEff
 import { Column, ExtendedColumn, Row, SortingDirection, UseColumns } from '../types';
 import {
   builtInValueFn,
-  datetimeToNumber,
-  dateToNumber,
-  defined,
   compareBigintValues,
   compareDates,
   compareDateTimes,
   compareTimes,
+  defined,
   generateString,
   GenerateStringOptions,
   getNextSortingDirection,
-  noop,
-  timeToNumber,
-  untypedValueFn,
-  valueFn
+  noop
 } from '../utils';
 import { useOptions } from '../hooks';
 
@@ -35,7 +30,7 @@ export const ColumnContext = createContext<ColumnContextProps>({
   toggleColumnVisibility: noop,
   swapColumnOrder: noop,
   sort: noop,
-  toggleSort: noop,
+  toggleSort: noop
 });
 
 type Props<
@@ -79,9 +74,9 @@ export function ColumnContextProvider<
       relativeTimeFormatter:
         column.type === 'relative-time'
           ? new Intl.RelativeTimeFormat(
-              internationalizationOptions.locale,
-              column.formatOptions ?? internationalizationOptions.relativeTimeFormatOptions
-            )
+            internationalizationOptions.locale,
+            column.formatOptions ?? internationalizationOptions.relativeTimeFormatOptions
+          )
           : undefined,
       booleanFormatOptions:
         column.type === 'boolean'
@@ -127,41 +122,43 @@ export function ColumnContextProvider<
           case 'multi-string':
           case 'boolean':
             return (
-              directionMultiplicative *
-              compareStrings(
+              directionMultiplicative * compareStrings(
                 generateString(a, column, generateStringOptions(column)),
                 generateString(b, column, generateStringOptions(column))
               )
             );
           case 'number':
+            return directionMultiplicative * (
+              (builtInValueFn<'number', RowData>(column)(a) ?? 0) - (builtInValueFn<'number', RowData>(column)(b) ?? 0)
+            );
           case 'relative-time':
-            // eslint-disable-next-line
-            // @ts-ignore
-            return directionMultiplicative * ((builtInValueFn(column)(a) ?? 0) - (builtInValueFn(column)(b) ?? 0));
+            return directionMultiplicative * (
+              (builtInValueFn<'relative-time', RowData>(column)(a) ?? 0) - (builtInValueFn<'relative-time', RowData>(column)(b) ?? 0)
+            );
           case 'bigint':
             return directionMultiplicative * compareBigintValues(
-              valueFn(column.type, column.value)(a),
-              valueFn(column.type, column.value)(b)
+              builtInValueFn<'bigint', RowData>(column)(a),
+              builtInValueFn<'bigint', RowData>(column)(b)
             );
           case 'date':
             return (
               directionMultiplicative * compareDates(
-                valueFn(column.type, column.value)(a),
-                valueFn(column.type, column.value)(b)
+                builtInValueFn<'date', RowData>(column)(a),
+                builtInValueFn<'date', RowData>(column)(b)
               )
             );
           case 'time':
             return (
               directionMultiplicative * compareTimes(
-                valueFn(column.type, column.value)(a),
-                valueFn(column.type, column.value)(b)
+                builtInValueFn<'time', RowData>(column)(a),
+                builtInValueFn<'time', RowData>(column)(b)
               )
             );
           case 'date-time':
             return (
               directionMultiplicative * compareDateTimes(
-                valueFn(column.type, column.value)(a),
-                valueFn(column.type, column.value)(b)
+                builtInValueFn<'date-time', RowData>(column)(a),
+                builtInValueFn<'date-time', RowData>(column)(b)
               )
             );
           default:
@@ -184,7 +181,7 @@ export function ColumnContextProvider<
         searchFn: column.searchFn ?? builtInSearchFn({ ...column, value: builtInValueFn(column) }),
         sortingDirection: column.sortingDirection ?? undefined,
         sortFn: column.sortFn ?? builtInSortFn({ ...column, value: builtInValueFn(column) }),
-        order: column.order ?? order,
+        order: column.order ?? order
       }) as ExtendedColumn<RowData, CustomColumn>,
     [builtInSearchFn, builtInSortFn]
   );
@@ -225,9 +222,9 @@ export function ColumnContextProvider<
         previousColumns.map((column) =>
           column.id === columnId
             ? {
-                ...column,
-                hidden: true,
-              }
+              ...column,
+              hidden: true
+            }
             : column
         )
       ),
@@ -239,9 +236,9 @@ export function ColumnContextProvider<
         currentColumns.map((column) =>
           column.id === columnId
             ? {
-                ...column,
-                hidden: false,
-              }
+              ...column,
+              hidden: false
+            }
             : column
         )
       ),
@@ -253,9 +250,9 @@ export function ColumnContextProvider<
         currentColumns.map((column) =>
           column.id === columnId
             ? {
-                ...column,
-                hidden: !column.hidden,
-              }
+              ...column,
+              hidden: !column.hidden
+            }
             : column
         )
       ),
@@ -298,7 +295,7 @@ export function ColumnContextProvider<
           toggleColumnVisibility,
           swapColumnOrder,
           sort,
-          toggleSort,
+          toggleSort
         }}
       >
         {children}
