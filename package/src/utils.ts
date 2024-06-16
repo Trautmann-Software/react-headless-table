@@ -1,10 +1,10 @@
-import { BooleanFormatOptions, Column, ExtendedColumn, Row, SortingDirection } from './types';
+import { BooleanFormatOptions, Column, Row, SortingDirection } from './types';
 
 export const noop = (): void => {
   return undefined;
 };
 
-export const defined = <T>(value: T | undefined | null): value is T => typeof value !== 'undefined' && value !== null;
+export const defined = <T>(value: T | null | undefined): value is T => typeof value !== 'undefined' && value !== null;
 
 export const equals = (a: Array<string>, b: Array<string>): boolean =>
   defined(a) && defined(b) && a.length === b.length && a.every((value, index) => b[index] === value);
@@ -20,17 +20,8 @@ export const getNextSortingDirection = (sortingDirection: SortingDirection): Sor
 };
 
 //#region Column['value']
-type ColumnType =
-  | 'string'
-  | 'number'
-  | 'bigint'
-  | 'boolean'
-  | 'multi-string'
-  | 'date'
-  | 'time'
-  | 'date-time'
-  | 'relative-time';
-type BuiltInValueFnResult<T extends ColumnType, RowData extends Record<string, any>> = T extends 'string'
+
+type BuiltInValueFnResult<T extends Column<RowData>['type'], RowData extends Record<string, any>> = T extends 'string'
   ? (row: Row<RowData>) => string | undefined
   : T extends 'multi-string'
     ? (row: Row<RowData>) => Array<string> | undefined
@@ -44,13 +35,14 @@ type BuiltInValueFnResult<T extends ColumnType, RowData extends Record<string, a
             ? (row: Row<RowData>) => Date | undefined
             : unknown;
 
-export function builtInValueFn<T extends ColumnType, RowData extends Record<string, any> = {}>(
+export function builtInValueFn<T extends Column<RowData>['type'], RowData extends Record<string, any> = {}>(
   column: Column<RowData>
 ): BuiltInValueFnResult<T, RowData> {
-  // eslint-disable-next-line
-  // @ts-ignore
-  return typeof column.value === 'function' ? column.value : (row: Row<RowData>) => row?.data?.[column.field];
+  return (
+    typeof column.value === 'function' ? column.value : (row: Row<RowData>) => row?.data?.[column.field]
+  ) as BuiltInValueFnResult<T, RowData>;
 }
+
 //#endregion Column['value']
 
 //#region Bigint
@@ -65,11 +57,16 @@ export const compareBigintValues = (a: bigint | undefined, b: bigint | undefined
 //#endregion Bigint
 
 //#region Date/Time
+
+function getEraMultiplicative(date: Date) {
+  return date.getFullYear() < 0 ? -1 : 1;
+}
+
 export const dateToNumber = (date: Date | undefined) =>
   defined(date)
     ? date.getFullYear() * 100_00 +
-      (date.getFullYear() < 0 ? -1 : 1) * (date.getMonth() + 1) * 100 +
-      (date.getFullYear() < 0 ? -1 : 1) * date.getDate()
+      getEraMultiplicative(date) * (date.getMonth() + 1) * 100 +
+      getEraMultiplicative(date) * date.getDate()
     : 0;
 
 export const compareDates = (a: Date | undefined, b: Date | undefined) =>
@@ -84,11 +81,11 @@ export const compareTimes = (a: Date | undefined, b: Date | undefined) =>
 export const datetimeToNumber = (datetime: Date | undefined) =>
   defined(datetime)
     ? datetime.getFullYear() * 100_00_00_00_00 +
-      (datetime.getFullYear() < 0 ? -1 : 1) * (datetime.getMonth() + 1) * 100_00_00_00 +
-      (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getDate() * 100_00_00 +
-      (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getHours() * 100_00 +
-      (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getMinutes() * 100 +
-      (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getSeconds()
+      getEraMultiplicative(datetime) * (datetime.getMonth() + 1) * 100_00_00_00 +
+      getEraMultiplicative(datetime) * datetime.getDate() * 100_00_00 +
+      getEraMultiplicative(datetime) * datetime.getHours() * 100_00 +
+      getEraMultiplicative(datetime) * datetime.getMinutes() * 100 +
+      getEraMultiplicative(datetime) * datetime.getSeconds()
     : 0;
 
 export const compareDateTimes = (a: Date | undefined, b: Date | undefined) =>
@@ -102,14 +99,13 @@ const generateForString = (value: string | undefined | null): string => (defined
 const generateForMultiString = (value: Array<string> | undefined | null): string =>
   defined(value) ? value.map(generateForString).join(', ') : '';
 
+const translateBoolean = (value: boolean | undefined | null, translations: BooleanFormatOptions): string =>
+  defined(value)
+    ? translations?.[String(value) as Exclude<keyof BooleanFormatOptions, 'empty'>]
+    : translations?.['empty'];
+
 const generateForBoolean = (value: boolean | undefined | null, translations?: BooleanFormatOptions): string =>
-  defined(translations)
-    ? defined(value)
-      ? value
-        ? translations?.['true']
-        : translations?.['false']
-      : translations?.['empty']
-    : '';
+  defined(translations) ? translateBoolean(value, translations) ?? '' : '';
 
 const generateForNumber = (
   value: number | undefined | null,
@@ -203,4 +199,5 @@ export function generateString<RowData extends Record<string, any> = {}>(
       return generateForBoolean(builtInValueFn(column)(row), options.booleanFormatOptions);
   }
 }
+
 //#endregion Stringify

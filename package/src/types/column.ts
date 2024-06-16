@@ -13,7 +13,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
   [Key in keyof CustomColumn]: Key extends undefined ? never : CustomColumn[Key];
 } & (
   | {
-      type: 'string';
+      readonly type: 'string';
       /**
        * Can be used to define complex way of access to the cell value from row data. Works well together with default
        * sorting, filtering, export, without needing to override them to access value from deep child objects.
@@ -23,11 +23,11 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       value?: (row: Row<RowData>) => string | undefined;
     }
   | {
-      type: 'multi-string';
+      readonly type: 'multi-string';
       value?: (row: Row<RowData>) => Array<string> | undefined;
     }
   | {
-      type: 'boolean';
+      readonly type: 'boolean';
       value?: (row: Row<RowData>) => boolean | undefined;
       /**
        * Format options for 'boolean' type values.
@@ -37,7 +37,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: BooleanFormatOptions;
     }
   | {
-      type: 'number';
+      readonly type: 'number';
       value?: (row: Row<RowData>) => number | undefined;
       /**
        * Locale that overrides global/browser locale (navigator.language) for this column.
@@ -51,7 +51,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: Intl.NumberFormatOptions;
     }
   | {
-      type: 'bigint';
+      readonly type: 'bigint';
       value?: (row: Row<RowData>) => bigint | undefined;
       locale?: string;
       /**
@@ -61,7 +61,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: BigIntToLocaleStringOptions;
     }
   | {
-      type: 'date';
+      readonly type: 'date';
       value?: (row: Row<RowData>) => Date | undefined;
       locale?: string;
       /**
@@ -71,7 +71,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: Intl.DateTimeFormatOptions;
     }
   | {
-      type: 'time';
+      readonly type: 'time';
       value?: (row: Row<RowData>) => Date | undefined;
       locale?: string;
       /**
@@ -81,7 +81,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: Intl.DateTimeFormatOptions;
     }
   | {
-      type: 'date-time';
+      readonly type: 'date-time';
       value?: (row: Row<RowData>) => Date | undefined;
       locale?: string;
       /**
@@ -91,7 +91,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: Intl.DateTimeFormatOptions;
     }
   | {
-      type: 'relative-time';
+      readonly type: 'relative-time';
       value?: (row: Row<RowData>) => number | undefined;
       locale?: string;
       /**
@@ -188,7 +188,7 @@ export type UseColumns<RowData extends Record<string, any> = {}, CustomColumn ex
    */
   swapColumnOrder: (columnId1: string, columnId2: string) => void;
   /**
-   * Sets `sortingDirection` attribute to the give one for the given column ID, and resets to undefined for all other columns.
+   * Sets `sortingDirection` attribute to the given one for the given column ID, and resets to undefined for all other columns.
    */
   sort: (columnId: string, sortingDirection: SortingDirection) => void;
   /**

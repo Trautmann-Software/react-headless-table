@@ -129,41 +129,42 @@ export function ColumnContextProvider<
               )
             );
           case 'number':
-            return (
-              directionMultiplicative *
-              ((builtInValueFn<'number', RowData>(column)(a) ?? 0) -
-                (builtInValueFn<'number', RowData>(column)(b) ?? 0))
-            );
           case 'relative-time':
             return (
               directionMultiplicative *
-              ((builtInValueFn<'relative-time', RowData>(column)(a) ?? 0) -
-                (builtInValueFn<'relative-time', RowData>(column)(b) ?? 0))
+              ((builtInValueFn<typeof column.type, RowData>(column)(a) ?? 0) -
+                (builtInValueFn<typeof column.type, RowData>(column)(b) ?? 0))
             );
           case 'bigint':
             return (
               directionMultiplicative *
               compareBigintValues(
-                builtInValueFn<'bigint', RowData>(column)(a),
-                builtInValueFn<'bigint', RowData>(column)(b)
+                builtInValueFn<typeof column.type, RowData>(column)(a),
+                builtInValueFn<typeof column.type, RowData>(column)(b)
               )
             );
           case 'date':
             return (
               directionMultiplicative *
-              compareDates(builtInValueFn<'date', RowData>(column)(a), builtInValueFn<'date', RowData>(column)(b))
+              compareDates(
+                builtInValueFn<typeof column.type, RowData>(column)(a),
+                builtInValueFn<typeof column.type, RowData>(column)(b)
+              )
             );
           case 'time':
             return (
               directionMultiplicative *
-              compareTimes(builtInValueFn<'time', RowData>(column)(a), builtInValueFn<'time', RowData>(column)(b))
+              compareTimes(
+                builtInValueFn<typeof column.type, RowData>(column)(a),
+                builtInValueFn<typeof column.type, RowData>(column)(b)
+              )
             );
           case 'date-time':
             return (
               directionMultiplicative *
               compareDateTimes(
-                builtInValueFn<'date-time', RowData>(column)(a),
-                builtInValueFn<'date-time', RowData>(column)(b)
+                builtInValueFn<typeof column.type, RowData>(column)(a),
+                builtInValueFn<typeof column.type, RowData>(column)(b)
               )
             );
           default:
