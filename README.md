@@ -25,7 +25,9 @@ npm i uuid @trautmann/react-headless-table
 ```
 
 Use it in your code:
+
 1. Wrap you table component into `ReactHeadlessTable` and provide it with necessary data
+
 ```js
 // table.js
 import { ReactHeadlessTable } from '@trautmann/react-headless-table';
@@ -37,14 +39,16 @@ export function Table(props) {
   return (
     <ReactHeadlessTable columns={columns} rows={rows}>
       <table>
-        <TableHead/>
-        <TableBody/>
+        <TableHead />
+        <TableBody />
       </table>
     </ReactHeadlessTable>
   );
 }
 ```
+
 2. Access data and functionality via hooks in child components
+
 ```js
 // table-head.js
 import { useColumns } from '@trautmann/react-headless-table';
@@ -54,7 +58,7 @@ export function TableHead() {
   return (
     <thead>
       <tr>
-        {columns.map(column => (
+        {columns.map((column) => (
           <td key={column.id}>{column.field}</td>
         ))}
       </tr>
@@ -62,6 +66,7 @@ export function TableHead() {
   );
 }
 ```
+
 ```js
 // table-body.js
 import { useColumns, useRows } from '@trautmann/react-headless-table';
@@ -71,9 +76,9 @@ export function TableHead() {
   const { rows } = useRows();
   return (
     <tbody>
-      {rows.map(row => (
+      {rows.map((row) => (
         <tr key={row.id}>
-          {columns.map(column => (
+          {columns.map((column) => (
             <td key={column.id}>{row.data?.[column.field] ?? ''}</td>
           ))}
         </tr>
@@ -93,28 +98,34 @@ Want to [become a code contributor](https://react-headless-table.trautmann.softw
 
 ## Sponsor the project
 
-If you find this package useful, please consider ❤️[sponsoring my work](https://github.com/sponsors/Trautmann-Software). Your sponsorship will help me dedicate more time to maintaining the project and will encourage me to add new features and fix existing bugs.
+If you find this package useful, please consider sponsoring my work: [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="objectFit: contain; width: 217px;"/>](https://www.buymeacoffee.com/rashad2985).
+Your sponsorship will help me dedicate more time to maintaining the project and will encourage me to add new features and fix existing bugs.
 
 ## Other means of support
 
-If you find this package useful, please 🙏star the repository, 💕[tweet about it](http://twitter.com/share?text=Build%20data-rich%20React%20applications%20with%20%40trautmann%2Freact-headless-table&url=https%3A%2F%2Freact-headless-table.trautmann.software&hashtags=react%2Cdatatable%2Cheadless%2Chooks&via=trautmann_soft), 👍[endorse me on LinkedIn](https://www.linkedin.com/in/rashad2985), [subscribe to our linktree](https://linktr.ee/trautmann.software?subscribe) or consider hiring my services.
+If you find this package useful
+
+- please star the repository,
+- [tweet about it](http://twitter.com/share?text=Build%20data-rich%20React%20applications%20with%20%40trautmann%2Freact-headless-table&url=https%3A%2F%2Freact-headless-table.trautmann.software&hashtags=react%2Cdatatable%2Cheadless%2Chooks&via=trautmann_soft),
+- [endorse me on LinkedIn](https://www.linkedin.com/in/rashad2985)
+- or consider hiring my services.
 
 The more stars this repository gets, the more visibility it gains among the developers and users community. The more
 users it gets, the more chances that some of those users will become active code contributors willing to put
 their effort into bringing new features to life and/or fixing bugs.
 
-As the repository gain awareness, my chances of getting motivated to work on Mantine-based projects will increase,
+As the repository gain awareness, my chances of getting motivated to work on more open source projects like this will increase,
 which in turn will help maintain my vested interest in keeping the project alive.
 
 ## License
 
-The [MIT License](https://github.com/Trautmann-Software/react-headless-table/blob/main/LICENSE).
+The [MIT License][license-url].
 
 [npm-url]: https://www.npmjs.com/package/@trautmann/react-headless-table
 [repo-url]: https://github.com/Trautmann-Software/react-headless-table
 [stars-url]: https://github.com/Trautmann-Software/react-headless-table/stargazers
 [closed-issues-url]: https://github.com/Trautmann-Software/react-headless-table/issues?q=is%3Aissue+is%3Aclosed
-[license-url]: LICENSE
+[license-url]: https://github.com/Trautmann-Software/react-headless-table/blob/HEAD/LICENSE
 [npm-image]: https://img.shields.io/npm/v/@trautmann/react-headless-table.svg?style=flat-square
 [license-image]: http://img.shields.io/npm/l/@trautmann/react-headless-table.svg?style=flat-square
 [downloads-image]: http://img.shields.io/npm/dm/@trautmann/react-headless-table.svg?style=flat-square

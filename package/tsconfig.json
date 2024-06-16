@@ -7,8 +7,9 @@
     "composite": false,
     "declaration": true,
     "declarationMap": true,
-    "esModuleInterop": true,
+    "declarationDir": "dist",
     "outDir": "dist",
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "inlineSources": false,
     "isolatedModules": true,
@@ -19,6 +20,6 @@
     "skipLibCheck": true,
     "strict": true
   },
-  "exclude": ["dist", "node_modules"],
+  "exclude": ["dist", "node_modules", "__tests__"],
   "include": ["."]
 }

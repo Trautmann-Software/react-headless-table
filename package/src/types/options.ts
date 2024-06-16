@@ -1,5 +1,3 @@
-import { RecursiveRequired } from './utility-types';
-
 export type BooleanFormatOptions = {
   true: string;
   false: string;
@@ -11,7 +9,7 @@ export type InternationalizationOptions = {
    * Locale that can be used to set globally.
    * Can be overridden for columns individually in column definitions.
    * Used for compare functions on searching, filtering and sorting.
-   * @default navigator.language
+   * @default undefined
    */
   locale?: string;
   /**
@@ -58,13 +56,32 @@ export type InternationalizationOptions = {
   booleanFormatOptions?: BooleanFormatOptions;
 };
 
-export type DetailPanelOptions = {
+export type RowOptions<RowData extends Record<string, any> = {}> = {
+  /**
+   * ID generation strategy for rows.
+   * @param rowData is the representation of a row data.
+   * @default `uuid.v4()` from `uuid` package.
+   */
+  idFn?: (rowData: RowData) => string;
   /**
    * Detail panel visibility type.
    * Defines whether a single panel at the same time can be showed or multiple panels from different rows.
    * @default 'single'
    */
-  behaviour?: 'single' | 'multiple';
+  detailsPanelType?: 'single' | 'multiple';
+};
+
+export type PaginationOptions = {
+  /**
+   * Current page number.
+   * @default 1
+   */
+  currentPage?: number;
+  /**
+   * Number of rows per page.
+   * @default 5
+   */
+  pageSize?: number;
 };
 
 /**
@@ -79,16 +96,20 @@ export type Options<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   CustomColumn extends Record<string, any> = {},
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  RowData extends Record<string, any> = {}
+  RowData extends Record<string, any> = {},
 > = { [Key in keyof CustomOptions]: Key extends undefined ? never : CustomOptions[Key] } & {
   /**
    * Internationalization options for supported value types.
    */
   internationalizationOptions?: InternationalizationOptions;
   /**
-   * Detail panel options.
+   * Row related options.
    */
-  detailPanelOptions?: DetailPanelOptions;
+  rowOptions?: RowOptions;
+  /**
+   * Pagination related options.
+   */
+  paginationOptions?: PaginationOptions;
 };
 
 /**
@@ -100,13 +121,21 @@ export type Options<
  */
 export type UseOptions<
   CustomOptions extends Record<string, any> = {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   CustomColumn extends Record<string, any> = {},
-  RowData extends Record<string, any> = {}
-> = { [Key in keyof CustomOptions]: Key extends undefined ? never : CustomOptions[Key] } & RecursiveRequired<
-  Omit<Options<{}, CustomColumn, RowData>, 'internationalizationOptions'>
-> & {
-    /**
-     * Internationalization options for supported value types.
-     */
-    internationalizationOptions: Required<InternationalizationOptions>;
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  RowData extends Record<string, any> = {},
+> = { [Key in keyof CustomOptions]: Key extends undefined ? never : CustomOptions[Key] } & {
+  /**
+   * Internationalization options for supported value types.
+   */
+  internationalizationOptions: InternationalizationOptions;
+  /**
+   * Row related options.
+   */
+  rowOptions: Required<RowOptions>;
+  /**
+   * Pagination related options.
+   */
+  paginationOptions: Required<PaginationOptions>;
+};

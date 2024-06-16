@@ -1,91 +1,49 @@
-import { BooleanFormatOptions, Column, ExtendedColumn, Row } from './types';
+import { BooleanFormatOptions, Column, Row, SortingDirection } from './types';
 
 export const noop = (): void => {
   return undefined;
 };
 
-export const defined = <T>(value: T | undefined | null): value is T => typeof value !== 'undefined' && value !== null;
+export const defined = <T>(value: T | null | undefined): value is T => typeof value !== 'undefined' && value !== null;
 
 export const equals = (a: Array<string>, b: Array<string>): boolean =>
   defined(a) && defined(b) && a.length === b.length && a.every((value, index) => b[index] === value);
 
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'date' | 'time' | 'date-time',
-  columnValueFn?: (row: Row<RowData>) => Date | undefined
-): (row: Row<RowData>) => Date | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'number' | 'relative-time',
-  columnValueFn?: (row: Row<RowData>) => number | undefined
-): (row: Row<RowData>) => number | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'bigint',
-  columnValueFn?: (row: Row<RowData>) => bigint | undefined
-): (row: Row<RowData>) => bigint | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'boolean',
-  columnValueFn?: (row: Row<RowData>) => boolean | undefined
-): (row: Row<RowData>) => boolean | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'string',
-  columnValueFn?: (row: Row<RowData>) => string | undefined
-): (row: Row<RowData>) => string | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: 'multi-string',
-  columnValueFn?: (row: Row<RowData>) => Array<string> | undefined
-): (row: Row<RowData>) => Array<string> | undefined;
-export function valueFn<RowData extends Record<string, any> = {}>(
-  columnType: Column<RowData>['type'],
-  columnValueFn?: Column<RowData>['value']
-): ExtendedColumn<RowData>['value'] {
-  switch (columnType) {
-    case 'string':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as string | undefined;
-    case 'multi-string':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as Array<string> | undefined;
-    case 'number':
-    case 'relative-time':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as number | undefined;
-    case 'bigint':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as bigint | undefined;
-    case 'date':
-    case 'time':
-    case 'date-time':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as Date | undefined;
-    case 'boolean':
-      return (row: Row<RowData>) =>
-        (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as boolean | undefined;
-    default:
-      return (row: Row<RowData>) => (typeof columnValueFn === 'function' ? columnValueFn(row) : undefined) as undefined;
+export const getNextSortingDirection = (sortingDirection: SortingDirection): SortingDirection => {
+  if (sortingDirection === 'asc') {
+    return 'desc';
+  } else if (sortingDirection === 'desc') {
+    return undefined;
+  } else {
+    return 'asc';
   }
-}
+};
 
-export function untypedValueFn<RowData extends Record<string, any> = {}>(
+//#region Column['value']
+
+type BuiltInValueFnResult<T extends Column<RowData>['type'], RowData extends Record<string, any>> = T extends 'string'
+  ? (row: Row<RowData>) => string | undefined
+  : T extends 'multi-string'
+    ? (row: Row<RowData>) => Array<string> | undefined
+    : T extends 'number' | 'relative-time'
+      ? (row: Row<RowData>) => number | undefined
+      : T extends 'bigint'
+        ? (row: Row<RowData>) => bigint | undefined
+        : T extends 'boolean'
+          ? (row: Row<RowData>) => boolean | undefined
+          : T extends 'date' | 'time' | 'date-time'
+            ? (row: Row<RowData>) => Date | undefined
+            : unknown;
+
+export function builtInValueFn<T extends Column<RowData>['type'], RowData extends Record<string, any> = {}>(
   column: Column<RowData>
-): ExtendedColumn<RowData>['value'] {
-  // eslint-disable-next-line
-  // @ts-ignore
-  return typeof column.value === 'function' ? column.value(row) : (row: Row<RowData>) => row?.data?.[column.field];
+): BuiltInValueFnResult<T, RowData> {
+  return (
+    typeof column.value === 'function' ? column.value : (row: Row<RowData>) => row?.data?.[column.field]
+  ) as BuiltInValueFnResult<T, RowData>;
 }
 
-/*export const valueFn = <ColumnType extends Column<RowData>, RowData extends Record<string, any> = {}>(column: Column<RowData>):
-  ColumnType extends ('date' | 'time' | 'date-time') ? ((row: Row<RowData>) => Date | undefined) : (
-    ColumnType extends ('number' | 'relative-time') ? ((row: Row<RowData>) => number | undefined) : (
-      ColumnType extends ('bigint') ? ((row: Row<RowData>) => bigint | undefined) : (
-        ColumnType extends ('boolean') ? ((row: Row<RowData>) => boolean | undefined) : (
-          ColumnType extends ('multi-string') ? ((row: Row<RowData>) => Array<string> | undefined) : (
-            (row: Row<RowData>) => string | undefined
-          )
-        )
-      )
-    )
-  ) => (row: Row<RowData>) => (typeof column.value === 'function'
-  ? column.value(row)
-  : rowA.data?.[column.field as keyof RowData]);*/
+//#endregion Column['value']
 
 //#region Bigint
 export const compareBigintValues = (a: bigint | undefined, b: bigint | undefined) => {
@@ -99,35 +57,40 @@ export const compareBigintValues = (a: bigint | undefined, b: bigint | undefined
 //#endregion Bigint
 
 //#region Date/Time
-export const dateToNumber = (date: Date) =>
-  date.getFullYear() * 100_00 +
-  (date.getFullYear() < 0 ? -1 : 1) * (date.getMonth() + 1) * 100 +
-  (date.getFullYear() < 0 ? -1 : 1) * date.getDate();
 
-export const compareDates = (a: Date | undefined, b: Date | undefined) => (
-  dateToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
-  dateToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
-);
+function getEraMultiplicative(date: Date) {
+  return date.getFullYear() < 0 ? -1 : 1;
+}
 
-export const timeToNumber = (time: Date) => time.getHours() * 100_00 + time.getMinutes() * 100 + time.getSeconds();
+export const dateToNumber = (date: Date | undefined) =>
+  defined(date)
+    ? date.getFullYear() * 100_00 +
+      getEraMultiplicative(date) * (date.getMonth() + 1) * 100 +
+      getEraMultiplicative(date) * date.getDate()
+    : 0;
 
-export const compareTimes = (a: Date | undefined, b: Date | undefined) => (
-  timeToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
-  timeToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
-);
+export const compareDates = (a: Date | undefined, b: Date | undefined) =>
+  dateToNumber(a ?? new Date('0000-01-01T00:00:00.000')) - dateToNumber(b ?? new Date('0000-01-01T00:00:00.000'));
 
-export const datetimeToNumber = (datetime: Date) =>
-  datetime.getFullYear() * 100_00_00_00_00 +
-  (datetime.getFullYear() < 0 ? -1 : 1) * (datetime.getMonth() + 1) * 100_00_00_00 +
-  (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getDate() * 100_00_00 +
-  (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getHours() * 100_00 +
-  (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getMinutes() * 100 +
-  (datetime.getFullYear() < 0 ? -1 : 1) * datetime.getSeconds();
+export const timeToNumber = (time: Date | undefined) =>
+  defined(time) ? time.getHours() * 100_00 + time.getMinutes() * 100 + time.getSeconds() : 0;
 
-export const compareDateTimes = (a: Date | undefined, b: Date | undefined) => (
+export const compareTimes = (a: Date | undefined, b: Date | undefined) =>
+  timeToNumber(a ?? new Date('0000-01-01T00:00:00.000')) - timeToNumber(b ?? new Date('0000-01-01T00:00:00.000'));
+
+export const datetimeToNumber = (datetime: Date | undefined) =>
+  defined(datetime)
+    ? datetime.getFullYear() * 100_00_00_00_00 +
+      getEraMultiplicative(datetime) * (datetime.getMonth() + 1) * 100_00_00_00 +
+      getEraMultiplicative(datetime) * datetime.getDate() * 100_00_00 +
+      getEraMultiplicative(datetime) * datetime.getHours() * 100_00 +
+      getEraMultiplicative(datetime) * datetime.getMinutes() * 100 +
+      getEraMultiplicative(datetime) * datetime.getSeconds()
+    : 0;
+
+export const compareDateTimes = (a: Date | undefined, b: Date | undefined) =>
   datetimeToNumber(a ?? new Date('0000-01-01T00:00:00.000')) -
-  datetimeToNumber(b ?? new Date('0000-01-01T00:00:00.000'))
-);
+  datetimeToNumber(b ?? new Date('0000-01-01T00:00:00.000'));
 //#endregion Date/Time
 
 //#region Stringify
@@ -136,14 +99,13 @@ const generateForString = (value: string | undefined | null): string => (defined
 const generateForMultiString = (value: Array<string> | undefined | null): string =>
   defined(value) ? value.map(generateForString).join(', ') : '';
 
+const translateBoolean = (value: boolean | undefined | null, translations: BooleanFormatOptions): string =>
+  defined(value)
+    ? translations?.[String(value) as Exclude<keyof BooleanFormatOptions, 'empty'>]
+    : translations?.['empty'];
+
 const generateForBoolean = (value: boolean | undefined | null, translations?: BooleanFormatOptions): string =>
-  defined(translations)
-    ? defined(value)
-      ? value
-        ? translations?.['true']
-        : translations?.['false']
-      : translations?.['empty']
-    : '';
+  defined(translations) ? translateBoolean(value, translations) ?? '' : '';
 
 const generateForNumber = (
   value: number | undefined | null,
@@ -200,33 +162,41 @@ export function generateString<RowData extends Record<string, any> = {}>(
 ) {
   switch (column.type) {
     case 'string':
-      return generateForString(valueFn(column.type, column.value)(row));
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForString(builtInValueFn(column)(row));
     case 'multi-string':
-      return generateForMultiString(valueFn(column.type, column.value)(row));
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForMultiString(builtInValueFn(column)(row));
     case 'number':
-      return generateForNumber(valueFn(column.type, column.value)(row), options.locale, options.numberFormatOptions);
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForNumber(builtInValueFn(column)(row), options.locale, options.numberFormatOptions);
     case 'relative-time':
-      return generateForRelativeTime(
-        valueFn(column.type, column.value)(row),
-        options.unit,
-        options.relativeTimeFormatter
-      );
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForRelativeTime(builtInValueFn(column)(row), options.unit, options.relativeTimeFormatter);
     case 'bigint':
-      return generateForBigint(valueFn(column.type, column.value)(row), options.locale, options.bigintFormatOptions);
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForBigint(builtInValueFn(column)(row), options.locale, options.bigintFormatOptions);
     case 'date':
-      return generateForDate(valueFn(column.type, column.value)(row), options.locale, options.dateFormatOptions);
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForDate(builtInValueFn(column)(row), options.locale, options.dateFormatOptions);
     case 'time':
-      return generateForTime(valueFn(column.type, column.value)(row), options.locale, options.timeFormatOptions);
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForTime(builtInValueFn(column)(row), options.locale, options.timeFormatOptions);
     case 'date-time':
-      return generateForDateTime(
-        valueFn(column.type, column.value)(row),
-        options.locale,
-        options.dateTimeFormatOptions
-      );
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForDateTime(builtInValueFn(column)(row), options.locale, options.dateTimeFormatOptions);
     case 'boolean':
-      return generateForBoolean(valueFn(column.type, column.value)(row), options.booleanFormatOptions);
-    default:
-      return '';
+      // eslint-disable-next-line
+      // @ts-ignore
+      return generateForBoolean(builtInValueFn(column)(row), options.booleanFormatOptions);
   }
 }
 

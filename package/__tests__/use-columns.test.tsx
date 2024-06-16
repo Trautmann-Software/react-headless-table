@@ -4,8 +4,10 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { TestComponentProvider } from './test-component-provider';
 import { CustomColumn, Data } from './test-data';
+import { defined } from '../src/utils';
+import { Fragment } from 'react';
 
-const columns: Array<Column<Data, CustomColumn>> = [
+const testColumns: Array<Column<Data, CustomColumn>> = [
   { field: 'string', type: 'string', customColumnField: 'customColumnFieldValue' },
   { field: 'multi-string', type: 'multi-string', customColumnField: 'customColumnFieldValue' },
   { field: 'boolean', type: 'boolean', hidden: true, customColumnField: 'customColumnFieldValue' },
@@ -15,48 +17,49 @@ const columns: Array<Column<Data, CustomColumn>> = [
   { field: 'time', type: 'time', customColumnField: 'customColumnFieldValue' },
   { field: 'date-time', type: 'date-time', customColumnField: 'customColumnFieldValue' },
   {
+    id: 'custom-id',
     field: 'relative-time',
     type: 'relative-time',
     relativeTimeFormatUnit: 'quarter',
+    sortingDirection: 'asc',
     customColumnField: 'customColumnFieldValue',
     customOptionalColumnField: 'customOptionalColumnFieldValue',
   },
 ];
 
 function TestComponent() {
-  const {
-    allColumns,
-    visibleColumns,
-    orderedVisibleColumns,
-    hideColumn,
-    showColumn,
-    toggleColumnVisibility,
-    swapColumnOrder,
-  } = useColumns<Data, CustomColumn>();
+  const { columns, hideColumn, showColumn, toggleColumnVisibility, swapColumnOrder, sort, toggleSort } = useColumns<
+    Data,
+    CustomColumn
+  >();
 
   return (
-    <>
+    <Fragment>
       <ul>
-        {allColumns.map((column) => (
-          <li key={column.field} role="columns" data-testid={`column-${column.field}`}>
+        {columns.map((column) => (
+          <li key={column.id} role="columns" data-testid={`column-${column.id}`}>
             <span role={column.customColumnField}>{column.customColumnField}</span>
             <span role={column.customOptionalColumnField}>{column.customOptionalColumnField}</span>
           </li>
         ))}
       </ul>
       <ul>
-        {visibleColumns.map((column) => (
-          <li key={column.field} role="visible-columns" data-testid={`visible-column-${column.field}`}>
-            {column.field}
-          </li>
-        ))}
+        {columns
+          .filter(({ hidden }) => !hidden)
+          .map((column) => (
+            <li key={column.id} role="visible-columns" data-testid={`visible-column-${column.id}`}>
+              {column.id}
+            </li>
+          ))}
       </ul>
       <ul>
-        {orderedVisibleColumns.map((column) => (
-          <li key={column.field} role="ordered-visible-columns" data-testid={`ordered-visible-column-${column.field}`}>
-            {column.field}
-          </li>
-        ))}
+        {columns
+          .filter(({ sortingDirection }) => defined(sortingDirection))
+          .map((column) => (
+            <li key={column.id} role="sorted-columns" data-testid={`sorted-column-${column.id}`}>
+              {column.sortingDirection}
+            </li>
+          ))}
       </ul>
 
       <button role="show-boolean-field" onClick={() => showColumn('boolean')}>
@@ -71,155 +74,130 @@ function TestComponent() {
       <button role="multi-string-and-bigint-fields" onClick={() => swapColumnOrder('multi-string', 'bigint')}>
         multi-string-and-bigint-fields
       </button>
-    </>
+      {/* Sorting */}
+      <button role="sort-string" onClick={() => sort('string', 'desc')}>
+        sort-string
+      </button>
+      <button role="toggle-sort-string" onClick={() => toggleSort('string')}>
+        toggle-sort-string
+      </button>
+    </Fragment>
   );
 }
 
 test('useColumns hook delivers correct columns', async () => {
   render(
-    <TestComponentProvider columns={columns}>
+    <TestComponentProvider columns={testColumns}>
       <TestComponent />
     </TestComponentProvider>
   );
 
-  // allColumns always contains all columns independent of everything
-  let allColumns = screen.getAllByRole('columns');
-  expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
-    (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
+  // columns always contains all columns independent of everything
+  let columns = screen.getAllByRole('columns');
+  expect(columns).toHaveLength(9);
+  ['string', 'multi-string', 'boolean', 'number', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach(
+    (id, index) => expect(columns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
-  // visibleColumns contains only currently visible columns in the same order as allColumns
+  // visibleColumns contains only currently visible columns in the same order as columns
   let visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach((id, index) =>
+  ['string', 'multi-string', 'number', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach((id, index) =>
     expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   ['boolean'].forEach((id) => expect(screen.queryByTestId(`visible-column-${id}`)).not.toBeInTheDocument());
-  // orderedVisibleColumns contains only currently visible columns ordered by currently order state
-  let orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
-  expect(orderedVisibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'number', 'date', 'time', 'date-time', 'relative-time', 'bigint'].forEach((id, index) =>
-    expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
-  );
-  ['boolean'].forEach((id) => expect(screen.queryByTestId(`ordered-visible-column-${id}`)).not.toBeInTheDocument());
 
   // Show initially hidden boolean column
   await userEvent.click(screen.getByRole('show-boolean-field'));
-  // allColumns always contains all columns independent of everything
-  allColumns = screen.getAllByRole('columns');
-  expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
-    (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
+  // columns always contains all columns independent of everything
+  columns = screen.getAllByRole('columns');
+  expect(columns).toHaveLength(9);
+  ['string', 'multi-string', 'boolean', 'number', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach(
+    (id, index) => expect(columns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
-  // visibleColumns contains only currently visible columns in the same order as allColumns
+  // visibleColumns contains only currently visible columns in the same order as columns
   visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
+  ['string', 'multi-string', 'boolean', 'number', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach(
     (id, index) => expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
-  );
-  // orderedVisibleColumns contains only currently visible columns ordered by currently order state
-  orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
-  expect(orderedVisibleColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'date', 'time', 'date-time', 'relative-time', 'bigint'].forEach(
-    (id, index) => expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
   );
 
   // Hide the visible number column
   await userEvent.click(screen.getByRole('hide-number-field'));
-  // allColumns always contains all columns independent of everything
-  allColumns = screen.getAllByRole('columns');
-  expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
-    (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
+  // columns always contains all columns independent of everything
+  columns = screen.getAllByRole('columns');
+  expect(columns).toHaveLength(9);
+  ['string', 'multi-string', 'boolean', 'number', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach(
+    (id, index) => expect(columns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
-  // visibleColumns contains only currently visible columns in the same order as allColumns
+  // visibleColumns contains only currently visible columns in the same order as columns
   visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach((id, index) =>
+  ['string', 'multi-string', 'boolean', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach((id, index) =>
     expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   ['number'].forEach((id) => expect(screen.queryByTestId(`visible-column-${id}`)).not.toBeInTheDocument());
-  // orderedVisibleColumns contains only currently visible columns ordered by currently order state
-  orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
-  expect(orderedVisibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'boolean', 'date', 'time', 'date-time', 'relative-time', 'bigint'].forEach((id, index) =>
-    expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
-  );
-  ['number'].forEach((id) => expect(screen.queryByTestId(`ordered-visible-column-${id}`)).not.toBeInTheDocument());
 
   // Toggle the visible of the string column => hide
   await userEvent.click(screen.getByRole('toggle-string-field'));
-  // allColumns always contains all columns independent of everything
-  allColumns = screen.getAllByRole('columns');
-  expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
-    (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
+  // columns always contains all columns independent of everything
+  columns = screen.getAllByRole('columns');
+  expect(columns).toHaveLength(9);
+  ['string', 'multi-string', 'boolean', 'number', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach(
+    (id, index) => expect(columns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
-  // visibleColumns contains only currently visible columns in the same order as allColumns
+  // visibleColumns contains only currently visible columns in the same order as columns
   visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(7);
-  ['multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach((id, index) =>
+  ['multi-string', 'boolean', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach((id, index) =>
     expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   ['string', 'number'].forEach((id) => expect(screen.queryByTestId(`visible-column-${id}`)).not.toBeInTheDocument());
-  // orderedVisibleColumns contains only currently visible columns ordered by currently order state
-  orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
-  expect(orderedVisibleColumns).toHaveLength(7);
-  ['multi-string', 'boolean', 'date', 'time', 'date-time', 'relative-time', 'bigint'].forEach((id, index) =>
-    expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
-  );
-  ['string', 'number'].forEach((id) =>
-    expect(screen.queryByTestId(`ordered-visible-column-${id}`)).not.toBeInTheDocument()
-  );
 
   // Toggle the visible of the string column => show
   await userEvent.click(screen.getByRole('toggle-string-field'));
-  // allColumns always contains all columns independent of everything
-  allColumns = screen.getAllByRole('columns');
-  expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
-    (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
+  // columns always contains all columns independent of everything
+  columns = screen.getAllByRole('columns');
+  expect(columns).toHaveLength(9);
+  ['string', 'multi-string', 'boolean', 'number', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach(
+    (id, index) => expect(columns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
-  // visibleColumns contains only currently visible columns in the same order as allColumns
+  // visibleColumns contains only currently visible columns in the same order as columns
   visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach((id, index) =>
+  ['string', 'multi-string', 'boolean', 'date', 'time', 'date-time', 'custom-id', 'bigint'].forEach((id, index) =>
     expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   ['number'].forEach((id) => expect(screen.queryByTestId(`visible-column-${id}`)).not.toBeInTheDocument());
-  // orderedVisibleColumns contains only currently visible columns ordered by currently order state
-  orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
-  expect(orderedVisibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'boolean', 'date', 'time', 'date-time', 'relative-time', 'bigint'].forEach((id, index) =>
-    expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
-  );
-  ['number'].forEach((id) => expect(screen.queryByTestId(`ordered-visible-column-${id}`)).not.toBeInTheDocument());
 
   // Swap the order of the columns: multi-string <=> bigint
   await userEvent.click(screen.getByRole('multi-string-and-bigint-fields'));
-  // New order: 'string', 'bigint', 'boolean', 'number', 'multi-string', 'date', 'time', 'date-time', 'relative-time'
-  // allColumns always contains all columns independent of everything
-  allColumns = screen.getAllByRole('columns');
-  expect(allColumns).toHaveLength(9);
-  ['string', 'multi-string', 'boolean', 'number', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach(
-    (id, index) => expect(allColumns[index]).toHaveAttribute('data-testid', `column-${id}`)
+  // New order: 'string', 'bigint', 'boolean', 'number', 'multi-string', 'date', 'time', 'date-time', 'custom-id'
+  // columns always contains all columns independent of everything
+  columns = screen.getAllByRole('columns');
+  expect(columns).toHaveLength(9);
+  ['string', 'bigint', 'boolean', 'number', 'date', 'time', 'date-time', 'custom-id', 'multi-string'].forEach(
+    (id, index) => expect(columns[index]).toHaveAttribute('data-testid', `column-${id}`)
   );
-  // visibleColumns contains only currently visible columns in the same order as allColumns
+  // visibleColumns contains only currently visible columns in the same order as columns
   visibleColumns = screen.getAllByRole('visible-columns');
   expect(visibleColumns).toHaveLength(8);
-  ['string', 'multi-string', 'boolean', 'bigint', 'date', 'time', 'date-time', 'relative-time'].forEach((id, index) =>
+  ['string', 'bigint', 'boolean', 'date', 'time', 'date-time', 'custom-id', 'multi-string'].forEach((id, index) =>
     expect(visibleColumns[index]).toHaveAttribute('data-testid', `visible-column-${id}`)
   );
   ['number'].forEach((id) => expect(screen.queryByTestId(`visible-column-${id}`)).not.toBeInTheDocument());
-  // orderedVisibleColumns contains only currently visible columns ordered by currently order state
-  orderedVisibleColumns = screen.getAllByRole('ordered-visible-columns');
-  expect(orderedVisibleColumns).toHaveLength(8);
-  ['string', 'bigint', 'boolean', 'date', 'time', 'date-time', 'relative-time', 'multi-string'].forEach((id, index) =>
-    expect(orderedVisibleColumns[index]).toHaveAttribute('data-testid', `ordered-visible-column-${id}`)
-  );
-  ['number'].forEach((id) => expect(screen.queryByTestId(`ordered-visible-column-${id}`)).not.toBeInTheDocument());
 
   // Custom column fields
   expect(screen.getAllByRole('customColumnFieldValue')).toHaveLength(9);
   expect(screen.getAllByRole('customOptionalColumnFieldValue')).toHaveLength(1);
+
+  // Sorting state
+  expect(screen.getAllByRole('sorted-columns')).toHaveLength(1);
+  expect(screen.getByTestId('sorted-column-custom-id')).toHaveTextContent('asc');
+  // Change sorting to column 'string'
+  await userEvent.click(screen.getByRole('sort-string'));
+  expect(screen.getAllByRole('sorted-columns')).toHaveLength(1);
+  expect(screen.getByTestId('sorted-column-string')).toHaveTextContent('desc');
+  // Remove sorting from column 'string'
+  await userEvent.click(screen.getByRole('toggle-sort-string'));
+  expect(screen.queryAllByRole('sorted-columns')).toHaveLength(0);
 });

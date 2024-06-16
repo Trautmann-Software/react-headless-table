@@ -1,13 +1,17 @@
 import {
-  compareDates, compareDateTimes,
+  compareDates,
+  compareDateTimes,
   compareTimes,
   datetimeToNumber,
   dateToNumber,
   defined,
   equals,
+  generateString,
+  getNextSortingDirection,
   noop,
-  timeToNumber
+  timeToNumber,
 } from '../src/utils';
+import { Data } from './test-data';
 
 test('utils noop', async () => {
   expect(noop()).toBeUndefined();
@@ -29,19 +33,27 @@ test('utils equals', async () => {
   expect(equals(['abc', 'xyz'], ['abc', 'xyz'])).toBeTruthy();
 });
 
+test('utils getNextSortingDirection', async () => {
+  expect(getNextSortingDirection('asc')).toBe('desc');
+  expect(getNextSortingDirection('desc')).toBe(undefined);
+  expect(getNextSortingDirection(undefined)).toBe('asc');
+});
+
+//#region Date & Time
 test('utils dateToNumber', async () => {
+  expect(dateToNumber(undefined)).toBe(0);
   // A.D.
-  expect(dateToNumber(new Date('2022-01-01'))).toBe(2022_01_01);
-  expect(dateToNumber(new Date('2022-12-31'))).toBe(2022_12_31);
-  expect(dateToNumber(new Date('0500-01-01'))).toBe(500_01_01);
-  expect(dateToNumber(new Date('0500-12-31'))).toBe(500_12_31);
-  expect(dateToNumber(new Date('0000-01-01'))).toBe(1_01);
-  expect(dateToNumber(new Date('0000-12-31'))).toBe(12_31);
+  expect(dateToNumber(new Date('2022-01-01T11:22:33'))).toBe(2022_01_01);
+  expect(dateToNumber(new Date('2022-12-31T11:22:33'))).toBe(2022_12_31);
+  expect(dateToNumber(new Date('0500-01-01T11:22:33'))).toBe(500_01_01);
+  expect(dateToNumber(new Date('0500-12-31T11:22:33'))).toBe(500_12_31);
+  expect(dateToNumber(new Date('0000-01-01T11:22:33'))).toBe(1_01);
+  expect(dateToNumber(new Date('0000-12-31T11:22:33'))).toBe(12_31);
   // B.C.
-  expect(dateToNumber(new Date('-000001-01-01'))).toBe(-1_01_01);
-  expect(dateToNumber(new Date('-000001-12-31'))).toBe(-1_12_31);
-  expect(dateToNumber(new Date('-012000-01-01'))).toBe(-12000_01_01);
-  expect(dateToNumber(new Date('-012000-12-31'))).toBe(-12000_12_31);
+  expect(dateToNumber(new Date('-000001-01-01T11:22:33'))).toBe(-1_01_01);
+  expect(dateToNumber(new Date('-000001-12-31T11:22:33'))).toBe(-1_12_31);
+  expect(dateToNumber(new Date('-012000-01-01T11:22:33'))).toBe(-12000_01_01);
+  expect(dateToNumber(new Date('-012000-12-31T11:22:33'))).toBe(-12000_12_31);
 });
 
 test('utils compareDates', async () => {
@@ -120,25 +132,76 @@ test('utils datetimeToNumber', async () => {
 
 test('utils compareDateTimes', async () => {
   // A.D.
-  expect(compareDateTimes(new Date('2022-01-01T00:00:00.000'), new Date('2023-01-01T00:00:00.000'))).toBe(-1_00_00_00_00_00);
-  expect(compareDateTimes(new Date('2022-01-01T00:00:00.000'), new Date('2022-02-01T00:00:00.000'))).toBe(-1_00_00_00_00);
+  expect(compareDateTimes(new Date('2022-01-01T00:00:00.000'), new Date('2023-01-01T00:00:00.000'))).toBe(
+    -1_00_00_00_00_00
+  );
+  expect(compareDateTimes(new Date('2022-01-01T00:00:00.000'), new Date('2022-02-01T00:00:00.000'))).toBe(
+    -1_00_00_00_00
+  );
   expect(compareDateTimes(new Date('2022-01-01T00:00:00.000'), new Date('2022-01-02T00:00:00.000'))).toBe(-1_00_00_00);
   expect(compareDateTimes(new Date('2022-01-01T00:00:01.000'), new Date('2022-01-02T00:00:00.000'))).toBe(-99_99_99);
   expect(compareDateTimes(new Date('2022-01-01T00:00:00.000'), new Date('2022-01-01T00:00:00.000'))).toBe(0);
   expect(compareDateTimes(new Date('2022-01-01T00:00:01.000'), new Date('2022-01-01T00:00:00.000'))).toBe(1);
-  expect(compareDateTimes(new Date('2023-01-01T00:00:00.000'), new Date('2022-01-01T00:00:00.000'))).toBe(1_00_00_00_00_00);
-  expect(compareDateTimes(new Date('2023-01-01T00:00:00.000'), new Date('2022-01-01T00:00:01.000'))).toBe(99_99_99_99_99);
+  expect(compareDateTimes(new Date('2023-01-01T00:00:00.000'), new Date('2022-01-01T00:00:00.000'))).toBe(
+    1_00_00_00_00_00
+  );
+  expect(compareDateTimes(new Date('2023-01-01T00:00:00.000'), new Date('2022-01-01T00:00:01.000'))).toBe(
+    99_99_99_99_99
+  );
   expect(compareDateTimes(new Date('2022-02-01T00:00:00.000'), new Date('2022-01-01T00:00:00.000'))).toBe(100000000);
   expect(compareDateTimes(new Date('2022-01-02T00:00:00.000'), new Date('2022-01-01T00:00:00.000'))).toBe(1000000);
   // B.C.
-  expect(compareDateTimes(new Date('-012000-12-31T00:00:00.000'), new Date('-011999-12-31T00:00:00.000'))).toBe(-1_00_00_00_00_00);
-  expect(compareDateTimes(new Date('-012000-12-31T00:00:00.000'), new Date('-012000-11-30T00:00:00.000'))).toBe(-1_01_00_00_00);
-  expect(compareDateTimes(new Date('-012000-12-31T00:00:00.000'), new Date('-012000-12-30T00:00:00.000'))).toBe(-1_00_00_00);
-  expect(compareDateTimes(new Date('-012000-12-31T00:01:00.000'), new Date('-012000-12-30T00:00:00.000'))).toBe(-1_00_01_00);
+  expect(compareDateTimes(new Date('-012000-12-31T00:00:00.000'), new Date('-011999-12-31T00:00:00.000'))).toBe(
+    -1_00_00_00_00_00
+  );
+  expect(compareDateTimes(new Date('-012000-12-31T00:00:00.000'), new Date('-012000-11-30T00:00:00.000'))).toBe(
+    -1_01_00_00_00
+  );
+  expect(compareDateTimes(new Date('-012000-12-31T00:00:00.000'), new Date('-012000-12-30T00:00:00.000'))).toBe(
+    -1_00_00_00
+  );
+  expect(compareDateTimes(new Date('-012000-12-31T00:01:00.000'), new Date('-012000-12-30T00:00:00.000'))).toBe(
+    -1_00_01_00
+  );
   expect(compareDateTimes(new Date('-012000-12-31T00:00:00.000'), new Date('-012000-12-31T00:00:00.000'))).toBe(0);
   expect(compareDateTimes(new Date('-012000-12-31T00:01:00.000'), new Date('-012000-12-31T00:00:00.000'))).toBe(-1_00);
-  expect(compareDateTimes(new Date('-011999-12-31T00:00:00.000'), new Date('-012000-12-31T00:00:00.000'))).toBe(1_00_00_00_00_00);
-  expect(compareDateTimes(new Date('-011999-12-31T00:00:00.000'), new Date('-012000-12-31T00:01:00.000'))).toBe(1_00_00_00_01_00);
-  expect(compareDateTimes(new Date('-012000-11-30T00:00:00.000'), new Date('-012000-12-31T00:00:00.000'))).toBe(1_01_00_00_00);
-  expect(compareDateTimes(new Date('-012000-12-30T00:00:00.000'), new Date('-012000-12-31T00:00:00.000'))).toBe(1_00_00_00);
+  expect(compareDateTimes(new Date('-011999-12-31T00:00:00.000'), new Date('-012000-12-31T00:00:00.000'))).toBe(
+    1_00_00_00_00_00
+  );
+  expect(compareDateTimes(new Date('-011999-12-31T00:00:00.000'), new Date('-012000-12-31T00:01:00.000'))).toBe(
+    1_00_00_00_01_00
+  );
+  expect(compareDateTimes(new Date('-012000-11-30T00:00:00.000'), new Date('-012000-12-31T00:00:00.000'))).toBe(
+    1_01_00_00_00
+  );
+  expect(compareDateTimes(new Date('-012000-12-30T00:00:00.000'), new Date('-012000-12-31T00:00:00.000'))).toBe(
+    1_00_00_00
+  );
 });
+//#endregion Date & Time
+
+//#region Stringify
+test('utils generateString', async () => {
+  expect(
+    generateString<Pick<Data, 'username'>>(
+      { id: 'id', data: { username: 'username-1' }, selected: false },
+      { field: 'username', type: 'string', value: (row) => row.data.username },
+      {}
+    )
+  ).toBe('username-1');
+  expect(
+    generateString<Pick<Data, 'age'>>(
+      { id: 'id', data: { age: 45 }, selected: false },
+      { field: 'age', type: 'number', value: (row) => row.data.age },
+      {}
+    )
+  ).toBe('45');
+  expect(
+    generateString<Pick<Data, 'vip'>>(
+      { id: 'id', data: { vip: true }, selected: false },
+      { field: 'vip', type: 'boolean', value: (row) => row.data.vip },
+      { booleanFormatOptions: { true: 'true', false: 'false', empty: '' } }
+    )
+  ).toBe('true');
+});
+//#endregion Stringify

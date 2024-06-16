@@ -1,9 +1,9 @@
-import { Column, useColumns, useSearchQuery } from '../src';
+import { Column, useColumns, useRows, useSearchQuery } from '../src';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { TestComponentProvider } from './test-component-provider';
-import { useRows } from '../src/hooks/use-rows';
+import { Fragment } from 'react';
 
 type RowData = {
   stringField: string;
@@ -100,10 +100,10 @@ export const rows: Array<RowData> = [
 
 function TestComponent() {
   const { searchQuery, setSearchQuery } = useSearchQuery();
-  const { orderedVisibleColumns } = useColumns<RowData>();
-  const { sortedRows } = useRows<RowData>();
+  const { columns } = useColumns<RowData>();
+  const { rows } = useRows<RowData>();
   return (
-    <>
+    <Fragment>
       <input
         role="search-input"
         type="text"
@@ -113,7 +113,7 @@ function TestComponent() {
       <table>
         <thead>
           <tr>
-            {orderedVisibleColumns.map(({ field }) => (
+            {columns.map(({ field }) => (
               <td key={field} role="table-header" data-testid={`table-header-${field}`}>
                 {field}
               </td>
@@ -121,9 +121,9 @@ function TestComponent() {
           </tr>
         </thead>
         <tbody>
-          {sortedRows.map((row) => (
+          {rows.map((row) => (
             <tr key={row.id} role="table-row" data-testid={`table-row-${row.data.stringField}`}>
-              {orderedVisibleColumns.map(({ field, value }) => (
+              {columns.map(({ field, value }) => (
                 <td
                   key={field}
                   role={`table-row-${row.data.stringField}-cell`}
@@ -136,7 +136,7 @@ function TestComponent() {
           ))}
         </tbody>
       </table>
-    </>
+    </Fragment>
   );
 }
 
@@ -174,8 +174,6 @@ test('react-headless-table provides correct data to render a table', async () =>
   );
 
   // Table cells
-  const tableCells = screen.getAllByRole('table-row-', { exact: false });
-  expect(tableCells).toHaveLength(9 * 6);
   const tableCellsString1 = screen.getAllByRole('table-row-string-1-cell');
   expect(tableCellsString1).toHaveLength(9);
   [
@@ -191,6 +189,11 @@ test('react-headless-table provides correct data to render a table', async () =>
   ].forEach((field, index) =>
     expect(tableCellsString1[index]).toHaveAttribute('data-testid', `table-row-string-1-cell-${field}`)
   );
+  expect(screen.getAllByRole('table-row-string-2-cell')).toHaveLength(9);
+  expect(screen.getAllByRole('table-row-string-3-cell')).toHaveLength(9);
+  expect(screen.getAllByRole('table-row-string-4-cell')).toHaveLength(9);
+  expect(screen.getAllByRole('table-row-string-5-cell')).toHaveLength(9);
+  expect(screen.getAllByRole('table-row-string-6-cell')).toHaveLength(9);
   //#endregion Initial state
 
   // Search and check rows

@@ -10,26 +10,23 @@
     "title": "Docs",
     "type": "page"
   },
-  "contact": {
-    "title": "Contact Us",
-    "type": "page"
-  },
-  "about": {
-    "title": "About Us",
-    "type": "page"
-  },
   "menu": {
-    "title": "Menu",
+    "title": "About",
     "type": "menu",
     "items": {
+      "company": {
+        "title": "Trautmann Software",
+        "href": "http://trautmann.software",
+        "newWindow": true
+      },
+      "author": {
+        "title": "Author",
+        "href": "http://rashad.trautmann.software",
+        "newWindow": true
+      },
       "contact": {
         "title": "Contact Us",
-        "href": "mailto:hi@example.com"
-      },
-      "my_external_link": {
-        "title": "Author",
-        "href": "https://github.com/rashad2985",
-        "newWindow": true
+        "href": "mailto:mail@trautmann.software?subject=Contact%20regarding%20React%20Headless%20Table"
       }
     }
   },

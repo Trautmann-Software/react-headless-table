@@ -1,6 +1,8 @@
 import { Row } from './row';
 import { BooleanFormatOptions } from './options';
 
+export type SortingDirection = 'asc' | 'desc' | undefined;
+
 /**
  * An extendable column.
  * Column can be extended with additional fields if necessary.
@@ -11,7 +13,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
   [Key in keyof CustomColumn]: Key extends undefined ? never : CustomColumn[Key];
 } & (
   | {
-      type: 'string';
+      readonly type: 'string';
       /**
        * Can be used to define complex way of access to the cell value from row data. Works well together with default
        * sorting, filtering, export, without needing to override them to access value from deep child objects.
@@ -21,11 +23,11 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       value?: (row: Row<RowData>) => string | undefined;
     }
   | {
-      type: 'multi-string';
+      readonly type: 'multi-string';
       value?: (row: Row<RowData>) => Array<string> | undefined;
     }
   | {
-      type: 'boolean';
+      readonly type: 'boolean';
       value?: (row: Row<RowData>) => boolean | undefined;
       /**
        * Format options for 'boolean' type values.
@@ -35,7 +37,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: BooleanFormatOptions;
     }
   | {
-      type: 'number';
+      readonly type: 'number';
       value?: (row: Row<RowData>) => number | undefined;
       /**
        * Locale that overrides global/browser locale (navigator.language) for this column.
@@ -49,7 +51,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: Intl.NumberFormatOptions;
     }
   | {
-      type: 'bigint';
+      readonly type: 'bigint';
       value?: (row: Row<RowData>) => bigint | undefined;
       locale?: string;
       /**
@@ -59,7 +61,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: BigIntToLocaleStringOptions;
     }
   | {
-      type: 'date';
+      readonly type: 'date';
       value?: (row: Row<RowData>) => Date | undefined;
       locale?: string;
       /**
@@ -69,7 +71,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: Intl.DateTimeFormatOptions;
     }
   | {
-      type: 'time';
+      readonly type: 'time';
       value?: (row: Row<RowData>) => Date | undefined;
       locale?: string;
       /**
@@ -79,7 +81,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: Intl.DateTimeFormatOptions;
     }
   | {
-      type: 'date-time';
+      readonly type: 'date-time';
       value?: (row: Row<RowData>) => Date | undefined;
       locale?: string;
       /**
@@ -89,7 +91,7 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
       formatOptions?: Intl.DateTimeFormatOptions;
     }
   | {
-      type: 'relative-time';
+      readonly type: 'relative-time';
       value?: (row: Row<RowData>) => number | undefined;
       locale?: string;
       /**
@@ -104,8 +106,14 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
     }
 ) & {
     /**
+     * Used as a key to reference the column itself.
+     * If not provided, then value of the `field`-attribute is used instead.
+     * Value of the id must be unique for each column!!!
+     */
+    id?: string;
+    /**
      * Used as a key to reference value in row data.
-     * The field is also serves to reference the column itself.
+     * The field also serves as a column ID to reference the column itself.
      * Value of the field must be unique for each column!!!
      * For a complex way of access to the cell value from row data see 'value'-attribute.
      */
@@ -127,14 +135,14 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
      */
     searchFn?: (term: string, row: Row<RowData>) => boolean;
     /**
-     * Flag to activate or disable filtering feature of column
-     * @default true
+     * Initial sorting direction for the column.
+     * @default undefined
      */
-    filterable?: boolean;
+    sortingDirection?: SortingDirection;
     /**
      * Overrides the sort algorithm for this column.
      */
-    sortFn?: (a: Row<RowData>, b: Row<RowData>) => number;
+    sortFn?: (a: Row<RowData>, b: Row<RowData>, sortingDirection?: SortingDirection) => number;
     /**
      * Initial order index of this column.
      * If not provided, array index is used!!!
@@ -150,7 +158,8 @@ export type Column<RowData extends Record<string, any> = {}, CustomColumn extend
  */
 export type ExtendedColumn<RowData extends Record<string, any> = {}, CustomColumn extends Record<string, any> = {}> = {
   [Key in keyof CustomColumn]: Key extends undefined ? never : CustomColumn[Key];
-} & Required<Column<RowData>>;
+} & Required<Omit<Column<RowData>, 'sortingDirection'>> &
+  Pick<Column<RowData>, 'sortingDirection'>;
 
 /**
  * Delivers Extended column information and functionality to work with column entries.
@@ -158,16 +167,33 @@ export type ExtendedColumn<RowData extends Record<string, any> = {}, CustomColum
  * @template CustomColumn is the additional type definitions for the column.
  */
 export type UseColumns<RowData extends Record<string, any> = {}, CustomColumn extends Record<string, any> = {}> = {
-  allColumns: Array<ExtendedColumn<RowData, CustomColumn>>;
-  visibleColumns: Array<ExtendedColumn<RowData, CustomColumn>>;
-  orderedVisibleColumns: Array<ExtendedColumn<RowData, CustomColumn>>;
-  hideColumn: (id: ExtendedColumn<RowData, CustomColumn>['field']) => void;
-  showColumn: (id: ExtendedColumn<RowData, CustomColumn>['field']) => void;
-  toggleColumnVisibility: (id: ExtendedColumn<RowData, CustomColumn>['field']) => void;
-  isColumnVisibilityChangePending: boolean;
-  swapColumnOrder: (
-    id1: ExtendedColumn<RowData, CustomColumn>['field'],
-    id2: ExtendedColumn<RowData, CustomColumn>['field']
-  ) => void;
-  isSwapColumnOrderPending: boolean;
+  /**
+   * Extended stateful columns.
+   */
+  columns: Array<ExtendedColumn<RowData, CustomColumn>>;
+  /**
+   * Sets `hidden` attribute to `true` for the given column ID.
+   */
+  hideColumn: (columnId: string) => void;
+  /**
+   * Sets `hidden` attribute to `false` for the given column ID.
+   */
+  showColumn: (columnId: string) => void;
+  /**
+   * Reverts `hidden` attribute for the given column ID.
+   */
+  toggleColumnVisibility: (columnId: string) => void;
+  /**
+   * Swaps `order` attributes for the given column IDs.
+   */
+  swapColumnOrder: (columnId1: string, columnId2: string) => void;
+  /**
+   * Sets `sortingDirection` attribute to the given one for the given column ID, and resets to undefined for all other columns.
+   */
+  sort: (columnId: string, sortingDirection: SortingDirection) => void;
+  /**
+   * Sets `sortingDirection` attribute to the next one for the given column ID, and resets to undefined for all other columns.
+   * Sequence: 'asc' => 'desc' => undefined => 'asc'
+   */
+  toggleSort: (columnId: string) => void;
 };

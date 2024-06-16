@@ -1,5 +1,9 @@
-import { FC } from 'react';
+import { FC, Fragment } from 'react';
+import * as process from 'process';
 
 export const Timestamp: FC<{ timestamp: Date }> = ({ timestamp }) => (
-  <span>Last updated on {timestamp.toLocaleDateString()}</span>
+  <Fragment>
+    <div>Version {process.env.PACKAGE_VERSION}</div>
+    <div>Last updated on {timestamp.toLocaleDateString()}</div>
+  </Fragment>
 );

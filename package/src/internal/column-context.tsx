@@ -1,16 +1,18 @@
 import { createContext, PropsWithChildren, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
-import { Column, ExtendedColumn, Row } from '../types';
+import { Column, ExtendedColumn, Row, SortingDirection, UseColumns } from '../types';
 import {
+  builtInValueFn,
   compareBigintValues,
   compareDates,
   compareDateTimes,
   compareTimes,
+  defined,
   generateString,
   GenerateStringOptions,
-  untypedValueFn,
-  valueFn
+  getNextSortingDirection,
+  noop,
 } from '../utils';
-import { useOptions } from '../hooks/use-options';
+import { useOptions } from '../hooks';
 
 /**
  * @template RowData is the generic row type.
@@ -18,18 +20,22 @@ import { useOptions } from '../hooks/use-options';
  */
 export type ColumnContextProps<
   RowData extends Record<string, any> = {},
-  CustomColumn extends Record<string, any> = {}
-> = {
-  columns: Array<ExtendedColumn<RowData, CustomColumn>>;
-};
+  CustomColumn extends Record<string, any> = {},
+> = UseColumns<RowData, CustomColumn>;
 
 export const ColumnContext = createContext<ColumnContextProps>({
-  columns: []
+  columns: [],
+  hideColumn: noop,
+  showColumn: noop,
+  toggleColumnVisibility: noop,
+  swapColumnOrder: noop,
+  sort: noop,
+  toggleSort: noop,
 });
 
 type Props<
   RowData extends Record<string, any> = {},
-  CustomColumn extends Record<string, any> = {}
+  CustomColumn extends Record<string, any> = {},
 > = PropsWithChildren<{
   columns: Array<Column<RowData, CustomColumn>>;
 }>;
@@ -40,11 +46,14 @@ type Props<
  */
 export function ColumnContextProvider<
   RowData extends Record<string, any> = {},
-  CustomColumn extends Record<string, any> = {}
+  CustomColumn extends Record<string, any> = {},
 >(props: Props<RowData, CustomColumn>) {
   const { children, columns: passedColumns } = props;
+  const deferredPassedColumns = useDeferredValue(passedColumns);
+
   const [columns, setColumns] = useState<Array<ExtendedColumn<RowData, CustomColumn>>>([]);
 
+  //#region Extend columns
   const { internationalizationOptions } = useOptions<{}, CustomColumn, RowData>();
   const generateStringOptions = useCallback<(column: Column<RowData, CustomColumn>) => GenerateStringOptions>(
     (column) => ({
@@ -65,14 +74,14 @@ export function ColumnContextProvider<
       relativeTimeFormatter:
         column.type === 'relative-time'
           ? new Intl.RelativeTimeFormat(
-            internationalizationOptions.locale,
-            column.formatOptions ?? internationalizationOptions.relativeTimeFormatOptions
-          )
+              internationalizationOptions.locale,
+              column.formatOptions ?? internationalizationOptions.relativeTimeFormatOptions
+            )
           : undefined,
       booleanFormatOptions:
         column.type === 'boolean'
           ? column.formatOptions ?? internationalizationOptions.booleanFormatOptions
-          : undefined
+          : undefined,
     }),
     [
       internationalizationOptions.bigintFormatOptions,
@@ -82,7 +91,7 @@ export function ColumnContextProvider<
       internationalizationOptions.locale,
       internationalizationOptions.numberFormatOptions,
       internationalizationOptions.relativeTimeFormatOptions,
-      internationalizationOptions.timeFormatOptions
+      internationalizationOptions.timeFormatOptions,
     ]
   );
   const builtInSearchFn = useCallback(
@@ -98,75 +107,206 @@ export function ColumnContextProvider<
   );
 
   const builtInSortFn = useCallback<
-    (column: Column<RowData, CustomColumn>) => (a: Row<RowData>, b: Row<RowData>) => number
+    (
+      column: Column<RowData, CustomColumn>
+    ) => (a: Row<RowData>, b: Row<RowData>, sortingDirection: SortingDirection) => number
   >(
-    (column) => (a, b) => {
-      switch (column.type) {
-        case 'string':
-        case 'multi-string':
-        case 'boolean':
-          return compareStrings(
-            generateString(a, column, generateStringOptions(column)),
-            generateString(b, column, generateStringOptions(column))
-          );
-        case 'number':
-        case 'relative-time':
-          return (valueFn(column.type, column.value)(a) ?? 0) - (valueFn(column.type, column.value)(b) ?? 0);
-        case 'bigint':
-          return compareBigintValues(
-            valueFn(column.type, column.value)(a),
-            valueFn(column.type, column.value)(b)
-          );
-        case 'date':
-          return compareDates(
-            valueFn(column.type, column.value)(a),
-            valueFn(column.type, column.value)(b)
-          );
-        case 'time':
-          return compareTimes(
-            valueFn(column.type, column.value)(a),
-            valueFn(column.type, column.value)(b)
-          );
-        case 'date-time':
-          return compareDateTimes(
-            valueFn(column.type, column.value)(a),
-            valueFn(column.type, column.value)(b)
-          );
-        default:
+    (column) => {
+      return (a, b, sortingDirection) => {
+        if (!defined(sortingDirection)) {
           return 0;
-      }
+        }
+        const directionMultiplicative = sortingDirection === 'asc' ? 1 : -1;
+        switch (column.type) {
+          case 'string':
+          case 'multi-string':
+          case 'boolean':
+            return (
+              directionMultiplicative *
+              compareStrings(
+                generateString(a, column, generateStringOptions(column)),
+                generateString(b, column, generateStringOptions(column))
+              )
+            );
+          case 'number':
+          case 'relative-time':
+            return (
+              directionMultiplicative *
+              ((builtInValueFn<typeof column.type, RowData>(column)(a) ?? 0) -
+                (builtInValueFn<typeof column.type, RowData>(column)(b) ?? 0))
+            );
+          case 'bigint':
+            return (
+              directionMultiplicative *
+              compareBigintValues(
+                builtInValueFn<typeof column.type, RowData>(column)(a),
+                builtInValueFn<typeof column.type, RowData>(column)(b)
+              )
+            );
+          case 'date':
+            return (
+              directionMultiplicative *
+              compareDates(
+                builtInValueFn<typeof column.type, RowData>(column)(a),
+                builtInValueFn<typeof column.type, RowData>(column)(b)
+              )
+            );
+          case 'time':
+            return (
+              directionMultiplicative *
+              compareTimes(
+                builtInValueFn<typeof column.type, RowData>(column)(a),
+                builtInValueFn<typeof column.type, RowData>(column)(b)
+              )
+            );
+          case 'date-time':
+            return (
+              directionMultiplicative *
+              compareDateTimes(
+                builtInValueFn<typeof column.type, RowData>(column)(a),
+                builtInValueFn<typeof column.type, RowData>(column)(b)
+              )
+            );
+          default:
+            return 0;
+        }
+      };
     },
     [compareStrings, generateStringOptions]
   );
-
-  const deferredColumns = useDeferredValue(passedColumns);
-  const extendedColumns = useMemo<Array<ExtendedColumn<RowData, CustomColumn>>>(
-    () =>
-      deferredColumns.map((column, index) => ({
-        ...(column),
-        value: untypedValueFn(column),
+  const extendColumn = useCallback<
+    (column: Column<RowData, CustomColumn>, order: number) => ExtendedColumn<RowData, CustomColumn>
+  >(
+    (column, order) =>
+      ({
+        ...(column as ExtendedColumn<RowData, {}>),
+        id: column.id ?? String(column.field),
+        value: builtInValueFn(column),
         hidden: column.hidden ?? false,
         searchable: column.searchable ?? true,
-        searchFn: column.searchFn ?? builtInSearchFn(column),
-        filterable: column.filterable ?? true,
-        sortFn: column.sortFn ?? builtInSortFn(column),
-        order: column.order ?? index
-      })) as Array<ExtendedColumn<RowData, CustomColumn>>,
-    [builtInSearchFn, builtInSortFn, deferredColumns]
+        searchFn: column.searchFn ?? builtInSearchFn({ ...column, value: builtInValueFn(column) }),
+        sortingDirection: column.sortingDirection ?? undefined,
+        sortFn: column.sortFn ?? builtInSortFn({ ...column, value: builtInValueFn(column) }),
+        order: column.order ?? order,
+      }) as ExtendedColumn<RowData, CustomColumn>,
+    [builtInSearchFn, builtInSortFn]
   );
-  const deferredExtendedColumns = useDeferredValue(extendedColumns);
-  useEffect(() => setColumns(deferredExtendedColumns), [deferredExtendedColumns]);
+
+  useEffect(
+    () =>
+      setColumns(
+        deferredPassedColumns.map((column, index) => extendColumn(column, index)).sort((a, b) => a.order - b.order)
+      ),
+    [deferredPassedColumns, extendColumn]
+  );
+  //#endregion Extend columns
+
+  //#region Column re-ordering
+  const swapColumnOrder = useCallback<UseColumns<RowData, CustomColumn>['swapColumnOrder']>(
+    (columnId1, columnId2) =>
+      setColumns((previousColumns) => {
+        const order1 = previousColumns.find((column) => column.id === columnId1)?.order as number;
+        const order2 = previousColumns.find((column) => column.id === columnId2)?.order as number;
+        return previousColumns
+          .map<ExtendedColumn<RowData, CustomColumn>>((column) => {
+            if (column.id === columnId1) {
+              return { ...column, order: order2 };
+            } else if (column.id === columnId2) {
+              return { ...column, order: order1 };
+            } else return column;
+          })
+          .sort((a, b) => a.order - b.order);
+      }),
+    []
+  );
+  //#endregion Column re-ordering
+
+  //#region Column visibility
+  const hideColumn = useCallback<UseColumns<RowData, CustomColumn>['hideColumn']>(
+    (columnId) =>
+      setColumns((previousColumns) =>
+        previousColumns.map((column) =>
+          column.id === columnId
+            ? {
+                ...column,
+                hidden: true,
+              }
+            : column
+        )
+      ),
+    []
+  );
+  const showColumn = useCallback<UseColumns<RowData, CustomColumn>['showColumn']>(
+    (columnId) =>
+      setColumns((currentColumns) =>
+        currentColumns.map((column) =>
+          column.id === columnId
+            ? {
+                ...column,
+                hidden: false,
+              }
+            : column
+        )
+      ),
+    []
+  );
+  const toggleColumnVisibility = useCallback<UseColumns<RowData, CustomColumn>['toggleColumnVisibility']>(
+    (columnId) =>
+      setColumns((currentColumns) =>
+        currentColumns.map((column) =>
+          column.id === columnId
+            ? {
+                ...column,
+                hidden: !column.hidden,
+              }
+            : column
+        )
+      ),
+    []
+  );
+  //#endregion Column visibility
+
+  //#region Sorting Direction
+  const sort = useCallback<UseColumns<RowData, CustomColumn>['sort']>(
+    (columnId, sortingDirection) =>
+      setColumns((previousColumns) =>
+        previousColumns.map((column) =>
+          column.id === columnId ? { ...column, sortingDirection } : { ...column, sortingDirection: undefined }
+        )
+      ),
+    []
+  );
+  const toggleSort = useCallback<UseColumns<RowData, CustomColumn>['toggleSort']>(
+    (columnId) =>
+      setColumns((previousColumns) =>
+        previousColumns.map((column) =>
+          column.id === columnId
+            ? { ...column, sortingDirection: getNextSortingDirection(column.sortingDirection) }
+            : { ...column, sortingDirection: undefined }
+        )
+      ),
+    []
+  );
+  //#endregion Sorting Direction
 
   return useMemo(
     () => (
       <ColumnContext.Provider
-        // eslint-disable-next-line
-        // @ts-ignore
-        value={{ columns }}
+        value={{
+          // eslint-disable-next-line
+          // @ts-ignore
+          columns,
+          hideColumn,
+          showColumn,
+          toggleColumnVisibility,
+          swapColumnOrder,
+          sort,
+          toggleSort,
+        }}
       >
         {children}
       </ColumnContext.Provider>
     ),
-    [children, columns]
+    [children, columns, hideColumn, showColumn, sort, swapColumnOrder, toggleColumnVisibility, toggleSort]
   );
 }

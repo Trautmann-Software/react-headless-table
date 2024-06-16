@@ -1,0 +1,156 @@
+import { Tab, Tabs } from 'nextra-theme-docs';
+import { JsIcon, PropsTable, ReactHeadlessTable, TabItem, TsIcon } from '../../components';
+
+## ReactHeadlessTable
+
+### Component props
+<PropsTable of={ReactHeadlessTable} />
+
+### Usage
+
+#### Basic Usage
+<Tabs
+  defaultIndex="0"
+  items={[
+    <TabItem icon={<TsIcon />} />,
+    <TabItem icon={<JsIcon />} />
+  ]}
+>
+  <Tab>
+    ```tsx filename="table.tsx"
+    import { ReactHeadlessTable } from '@trautmann/react-headless-table';
+
+    type MyDataStructure = {
+      username: string;
+      age: number;
+    };
+
+    const rows: Array<MyDataStructure> = [
+      { username: 'user-foo', age: 17 },
+      { username: 'user-bar', age: 42 }
+    ];
+
+    const columns: Array<Column<MyDataStructure>> = [
+      { field: 'username', type: 'string' },
+      { field: 'age', type: 'number' }
+    ];
+
+    function Table() {
+      return (
+        <ReactHeadlessTable<MyDataStructure>
+          columns={columns}
+          rows={rows}
+        >
+          <table>
+            <TableHead />
+            <TableBody />
+          </table>
+        </ReactHeadlessTable>
+      );
+    }
+    ```
+
+    ```tsx filename="table-head.tsx"
+    import { useColumns } from '@trautmann/react-headless-table';
+
+    function TableHead() {
+      const { columns } = useColumns<MyDataStructure>();
+      return (
+        <thead>
+          <tr>
+            {columns.map((column) => (
+              <td key={column.id}>{column.field}</td>
+            ))}
+          </tr>
+        </thead>
+      );
+    }
+    ```
+
+    ```tsx filename="table-body.tsx"
+    import { useColumns, useRows } from '@trautmann/react-headless-table';
+
+    function TableBody() {
+      const { columns } = useColumns<MyDataStructure>();
+      const { rows } = useRows<MyDataStructure>();
+      return (
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id}>
+              {columns.map((column) => (
+                <td key={column.id}>{row.data?.[column.field] ?? ''}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      );
+    }
+    ```
+  </Tab>
+  <Tab>
+    ```jsx filename="table.jsx"
+    import { ReactHeadlessTable } from '@trautmann/react-headless-table';
+
+    const rows = [
+      { username: 'user-foo', age: 17 },
+      { username: 'user-bar', age: 42 }
+    ];
+
+    const columns = [
+      { field: 'username', type: 'string' },
+      { field: 'age', type: 'number' }
+    ];
+
+    function Table() {
+      return (
+        <ReactHeadlessTable
+          columns={columns}
+          rows={rows}
+        >
+          <table>
+            <TableHead />
+            <TableBody />
+          </table>
+        </ReactHeadlessTable>
+      );
+    }
+    ```
+
+    ```jsx filename="table-head.jsx"
+    import { useColumns } from '@trautmann/react-headless-table';
+
+    function TableHead() {
+      const { columns } = useColumns();
+      return (
+        <thead>
+          <tr>
+            {columns.map((column) => (
+              <td key={column.id}>{column.field}</td>
+            ))}
+          </tr>
+        </thead>
+      );
+    }
+    ```
+
+    ```jsx filename="table-body.jsx"
+    import { useColumns, useRows } from '@trautmann/react-headless-table';
+
+    function TableBody() {
+      const { columns } = useColumns();
+      const { rows } = useRows();
+      return (
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id}>
+              {columns.map((column) => (
+                <td key={column.id}>{row.data?.[column.field] ?? ''}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>

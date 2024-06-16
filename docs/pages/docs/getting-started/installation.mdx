@@ -1,1 +1,24 @@
-## Apple
+import { Tab, Tabs } from 'nextra-theme-docs';
+import { NpmIcon, TabItem, YarnIcon } from '../../../components';
+
+## Installation
+
+Install the package and its dependencies:
+<Tabs
+  defaultIndex="0"
+  items={[
+    <TabItem label="npm" icon={<NpmIcon />} />,
+    <TabItem label="yarn" icon={<YarnIcon />} />
+  ]}
+>
+  <Tab>
+    ```sh
+    npm i @trautmann/react-headless-table uuid
+    ```
+  </Tab>
+  <Tab>
+    ```sh
+    yarn add @trautmann/react-headless-table uuid
+    ```
+  </Tab>
+</Tabs>
